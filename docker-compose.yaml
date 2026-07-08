@@ -1,0 +1,145 @@
+
+
+services:
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: web
+
+    env_file:
+      - .env
+
+    volumes:
+      - .:/usr/src/app
+
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+      redis:
+        condition: service_started
+
+      minio:
+        condition: service_started
+
+    command: >
+      sh -c "
+      python manage.py runserver 0.0.0.0:8000
+      "
+    ports:
+      - "8000:8000"
+    networks:
+      - frontend
+      - backend
+      - storage
+
+  postgres:
+
+    image: postgres:15
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - backend
+
+  redis:
+
+    image: redis:latest
+
+    restart: unless-stopped
+
+    command: redis-server --appendonly yes
+
+    volumes:
+      - redis_data:/data
+
+    networks:
+      - backend
+
+  minio:
+
+    image: minio/minio:RELEASE.2025-04-03T14-56-28Z 
+
+    command: server /data --console-address ":9001"
+
+    env_file:
+      - .env
+
+    volumes:
+      - minio_data:/data
+
+    networks:
+      - storage
+
+  celery:
+
+    build: .
+
+    container_name: celery_worker
+
+    command: celery -A config worker -l info
+
+    env_file:
+      - .env
+
+    depends_on:
+      - redis
+
+    networks:
+      - backend
+      - storage
+
+  celery-beat:
+
+    build: .
+
+    container_name: celery_beat
+
+    command: celery -A config beat -l info
+
+    env_file:
+      - .env
+
+    depends_on:
+      - redis
+
+    networks:
+      - backend
+
+volumes:
+
+  postgres_data:
+
+  redis_data:
+
+  minio_data:
+
+networks:
+
+  frontend:
+
+  backend:
+    internal: true
+
+  storage:
+    internal: true

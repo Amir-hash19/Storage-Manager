@@ -1,0 +1,86 @@
+# ==========================
+# Core
+# ==========================
+Django==5.2.6
+djangorestframework==3.16.1
+django-filter==25.1
+django-cors-headers==4.8.0
+
+# ==========================
+# Database
+# ==========================
+psycopg[binary]==3.2.9
+
+# ==========================
+# Redis & Background Tasks
+# ==========================
+redis==6.4.0
+celery==5.5.3
+django-celery-beat==2.8.1
+django-celery-results==2.6.0
+
+# ==========================
+# Authentication
+# ==========================
+djangorestframework-simplejwt==5.5.1
+PyJWT==2.10.1
+
+# ==========================
+# Object Storage
+# ==========================
+minio==7.2.16
+Pillow==11.3.0
+python-magic==0.4.27
+
+# ==========================
+# API Documentation
+# ==========================
+drf-spectacular==0.28.0
+
+# ==========================
+# Environment Variables
+# ==========================
+python-decouple==3.8
+
+# ==========================
+# Logging
+# ==========================
+structlog==25.4.0
+colorlog==6.9.0
+
+# ==========================
+# Monitoring
+# ==========================
+django-prometheus==2.4.1
+prometheus-client==0.22.1
+
+# ==========================
+# Production
+# ==========================
+gunicorn==23.0.0
+whitenoise==6.9.0
+
+# ==========================
+# Development
+# ==========================
+ipython==9.4.0
+django-extensions==4.1
+
+# ==========================
+# Testing
+# ==========================
+pytest==8.4.1
+pytest-django==4.11.1
+factory-boy==3.3.3
+model-bakery==1.20.5
+Faker==37.5.3
+coverage==7.10.1
+
+# ==========================
+# Code Quality
+# ==========================
+black==25.1.0
+isort==6.0.1
+ruff==0.12.7
+mypy==1.17.1
+pre-commit==4.3.0
