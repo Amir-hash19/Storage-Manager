@@ -233,7 +233,6 @@ $RECYCLE.BIN/
 media/
 uploads/
 downloads/
-storage/
 *.mp4
 *.avi
 *.mkv
@@ -258,33 +257,8 @@ storage/
 *.iso
 *.img
 
-# Node (if using)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-.pnpm-debug.log*
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
 
-# Terraform
-*.tfstate
-*.tfstate.*
-.terraform.lock.hcl
-.terraform/
 
-# Ansible
-*.retry
-ansible.log
-
-# Kubernetes
-*.kubeconfig
-*.kubeconfig.*
-*.secret.yaml
-*.secrets.yaml
-kustomization.local.yaml
 
 # Project specific
 .venv/

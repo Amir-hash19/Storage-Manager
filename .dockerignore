@@ -146,20 +146,6 @@ postgres_data/
 *.bak
 *.db-journal
 
-# Misc
-.jupyter/
-.ipynb_checkpoints/
-*.ipynb
-.cache/
-.npm/
-.node_modules/
-bower_components/
-*.orig
-*.rej
-.terraform/
-*.tfstate
-*.tfstate.*
-.terraform.lock.hcl
 
 # OS
 .DS_Store
@@ -172,7 +158,6 @@ Thumbs.db
 Desktop.ini
 
 # Project specific
-storage/
 media/
 uploads/
 downloads/
