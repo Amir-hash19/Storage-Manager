@@ -1,0 +1,25 @@
+from apps.accounts.models import UserAccount
+
+class UserRepository:
+
+
+    @staticmethod
+    def exists_by_email(email: str) -> bool:
+        return UserAccount.objects.filter(email=email).exists()
+    
+    @staticmethod
+    def exists_by_username(username: str) -> bool:
+        return UserAccount.objects.filter(username=username).exists()
+    
+    @staticmethod
+    def create_user(**data)-> UserAccount:
+
+        password = data.pop("password")
+
+        user = UserAccount(**data)
+
+        user.set_password(password)
+
+        user.save()
+
+        return user
