@@ -12,14 +12,15 @@ class UserRepository:
         return UserAccount.objects.filter(username=username).exists()
     
     @staticmethod
+    def get_by_email(email):
+        return UserAccount.objects.filter(email=email).first()
+    
+    
+    @staticmethod
     def create_user(**data)-> UserAccount:
-
         password = data.pop("password")
-
         user = UserAccount(**data)
-
         user.set_password(password)
-
         user.save()
 
         return user

@@ -8,3 +8,10 @@ class UserEmailAlreadyExists(Exception):
 class UserNameAlreadyExists(Exception):
     pass
 
+
+class InvalidCredentials(Exception):
+    pass
+
+
+class InactiveUser(Exception):
+    pass

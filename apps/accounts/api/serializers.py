@@ -14,7 +14,13 @@ class UserResponseSerializer(serializers.ModelSerializer):
         )
 
 
-class RegisterResponseSerializer(serializers.Serializer):
+class RegisterLoginResponseSerializer(serializers.Serializer):
     user = UserResponseSerializer(read_only=True)
     access = serializers.CharField(read_only=True)
     refresh = serializers.CharField(read_only=True)
+
+
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)

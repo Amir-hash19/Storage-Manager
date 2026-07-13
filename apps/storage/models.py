@@ -1,6 +1,6 @@
 from django.db import models
 from core.models.base import BaseModel
-
+import uuid
 
 class Folder(BaseModel):
     id = models.UUIDField(

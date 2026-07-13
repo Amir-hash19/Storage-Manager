@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 
     #apps
     "apps.accounts.apps.AccountsConfig",
+    "apps.audit.apps.AuditConfig",
    
 ]
 
@@ -161,3 +162,7 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
 
 }
+
+
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
