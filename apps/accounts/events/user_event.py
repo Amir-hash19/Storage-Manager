@@ -14,3 +14,12 @@ class UserRegisteredEvent:
 class UserLoggedInEvent:
     user_id: UUID
     email: str
+
+
+
+@dataclass(slots=True)
+class UserChangedPasswordEvent:
+    user_id: UUID
+    email: str
+    username: str
+    

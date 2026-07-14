@@ -1,12 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
-from .serializers import RegisterLoginResponseSerializer, UserResponseSerializer,LoginSerializer
+from rest_framework.permissions import IsAuthenticated
+from .serializers import ChangePasswordSerializer,RegisterLoginResponseSerializer, UserResponseSerializer,LoginSerializer
 
 from apps.accounts.services.create_user_service import RegisterUserService
 from apps.accounts.services.login import LoginUserService
-
+from apps.accounts.services.change_password import ChangePasswordService
 from apps.accounts.exceptions import UserEmailAlreadyExists, UserNameAlreadyExists, InvalidCredentials, InactiveUser
     
 
@@ -63,5 +63,24 @@ class LoginView(APIView):
         
         return Response(
             RegisterLoginResponseSerializer(result).data,
+            status=status.HTTP_200_OK
+        )
+    
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+
+    def post(seld, request):
+        serializer = ChangePasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        ChangePasswordService.execute(
+            user=request.user,
+            **serializer.validated_data
+        )
+
+        return Response(
+            {"message":"Password Changed Successfully."},
             status=status.HTTP_200_OK
         )

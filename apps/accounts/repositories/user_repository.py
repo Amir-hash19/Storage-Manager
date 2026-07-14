@@ -15,6 +15,9 @@ class UserRepository:
     def get_by_email(email):
         return UserAccount.objects.filter(email=email).first()
     
+    @staticmethod
+    def save(user):
+        user.save(update_fields=["password"])
     
     @staticmethod
     def create_user(**data)-> UserAccount:
