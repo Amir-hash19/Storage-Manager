@@ -38,3 +38,29 @@ class ChangePasswordSerializer(serializers.Serializer):
                 {"confirm_password":"Password do not match."}
             )
         return attrs
+
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserAccount
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+            "username",
+            "email",
+            "avatar",
+            "storage_quota",
+            "used_storage",
+            "is_verified"
+
+        )
+
+
+
+
+
+class LogOutSerializer(serializers.Serializer):
+    refresh = serializers.CharField()

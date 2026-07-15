@@ -1,12 +1,11 @@
 from apps.audit.models import AuditLog
 
 
-from pprint import pprint
+
 class AuditRepository:
 
     @staticmethod
     def create(**kwargs):
-        pprint(kwargs)
         return AuditLog.objects.create(**kwargs)
         
     

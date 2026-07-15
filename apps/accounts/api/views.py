@@ -2,11 +2,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import ChangePasswordSerializer,RegisterLoginResponseSerializer, UserResponseSerializer,LoginSerializer
+from .serializers import LogOutSerializer, UserProfileSerializer,ChangePasswordSerializer,RegisterLoginResponseSerializer, UserResponseSerializer,LoginSerializer
 
 from apps.accounts.services.create_user_service import RegisterUserService
 from apps.accounts.services.login import LoginUserService
+from apps.accounts.services.profile import UserProfileService
 from apps.accounts.services.change_password import ChangePasswordService
+from apps.accounts.services.logout import AuthService
 from apps.accounts.exceptions import UserEmailAlreadyExists, UserNameAlreadyExists, InvalidCredentials, InactiveUser
     
 
@@ -83,4 +85,38 @@ class ChangePasswordView(APIView):
         return Response(
             {"message":"Password Changed Successfully."},
             status=status.HTTP_200_OK
+        )
+
+
+class RetrieveUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+
+    def get(self, request):
+        user = UserProfileService().get_user_profile(request.user)
+        serializer = UserProfileSerializer(user)
+
+        return Response(serializer.data, status=200)
+
+
+
+
+
+
+class LogOutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = LogOutSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+
+        AuthService().logout(
+            serializer.validated_data["refresh"]
+        )
+        
+
+        return Response(
+            {"detail": "User LogOut Successfully."},
+            status=status.HTTP_204_NO_CONTENT
         )

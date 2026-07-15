@@ -30,6 +30,11 @@ class AuditService:
             resource="USER",
             resource_id=payload["user_id"],
             status="SUCCESS",
+
+            ip_address=payload.get("ip_address"),
+            user_agent=payload.get("user_agent"), 
+            request_id=payload.get("request_id"),
+
             metadata={
                 "email": payload["email"],
                 "username": payload["username"],
@@ -45,6 +50,10 @@ class AuditService:
             resource_id=payload["user_id"],
             status="SUCCESS",
             metadata=payload,
+            ip_address=payload.get("ip_address"),
+            user_agent=payload.get("user_agent"), 
+            request_id=payload.get("request_id")
+            
         )        
 
     @staticmethod
@@ -55,7 +64,10 @@ class AuditService:
             resource="USER",
             resource_id=payload["user_id"],
             status="SUCCESS",
-
+            ip_address=payload.get("ip_address"),
+            user_agent=payload.get("user_agent"), 
+            request_id=payload.get("request_id"),
+            
             metadata={
                 "email": payload["email"],
                 "username": payload["username"],

@@ -27,3 +27,7 @@ class PasswordsNotMatch(Exception):
 
 class OldPasswordMatchNewPassword(Exception):
     pass
+
+
+class UserDoesNotExists(Exception):
+    pass    

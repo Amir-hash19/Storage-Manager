@@ -2,6 +2,10 @@ from apps.accounts.models import UserAccount
 
 class UserRepository:
 
+    @staticmethod
+    def get_by_id(self, user_id):
+        return User.objects.filter(id=user_id).first()
+
 
     @staticmethod
     def exists_by_email(email: str) -> bool:

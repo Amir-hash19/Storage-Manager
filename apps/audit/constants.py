@@ -4,7 +4,7 @@ from django.db import models
 class AuditAction(models.TextChoices):
     REGISTER = "REGISTER", "Register"
     LOGIN = "LOGIN", "Login"
-    LOGOUT = "LOGOUT", "Logout"
+    PASSWORD_CHANGE = "PASSWORD_CHANGE", "Password Change"
 
     FILE_UPLOAD = "FILE_UPLOAD", "File Upload"
     FILE_DELETE = "FILE_DELETE", "File Delete"
@@ -16,7 +16,7 @@ class AuditAction(models.TextChoices):
     SHARE_CREATE = "SHARE_CREATE", "Share Create"
     SHARE_DELETE = "SHARE_DELETE", "Share Delete"
 
-    PASSWORD_CHANGE = "PASSWORD_CHANGE", "Password Change"
+    
 
 
 class AuditResource(models.TextChoices):
