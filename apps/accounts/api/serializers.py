@@ -64,3 +64,28 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class LogOutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
+
+
+
+
+
+class ForgetPasswordSerializer(serializers.Serializer):
+
+    email = serializers.EmailField()    
+
+
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+
+    token = serializers.CharField()
+
+    password = serializers.CharField(
+        write_only=True,
+        min_length=8,
+    )
+
+    confirm_password = serializers.CharField(
+        write_only=True,
+        min_length=8,
+    )

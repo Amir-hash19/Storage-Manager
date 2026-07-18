@@ -1,10 +1,14 @@
 from apps.accounts.models import UserAccount
+from apps.accounts.models import PasswordResetToken
+from django.utils import timezone
+
+
 
 class UserRepository:
 
     @staticmethod
     def get_by_id(self, user_id):
-        return User.objects.filter(id=user_id).first()
+        return UserAccount.objects.filter(id=user_id).first()
 
 
     @staticmethod
@@ -31,3 +35,41 @@ class UserRepository:
         user.save()
 
         return user
+    
+
+
+class PasswordResetRepository:
+
+    @staticmethod
+    def create(*, user, token_hash: str, expires_at) -> PasswordResetToken:
+        return PasswordResetToken.objects.create(
+            user=user,
+            token_hash=token_hash,
+            expires_at=expires_at
+        )
+    
+    @staticmethod
+    def get_by_hash(token_hash: str):
+
+        return (
+            PasswordResetToken.objects
+            .select_related("user")
+            .filter(token_hash=token_hash)
+            .first()
+        )
+    
+    @staticmethod
+    def delete_active_tokens(user):
+        PasswordResetToken.objects.filter(
+            user=user,
+            used_at__isnull=True
+        ).delete()
+
+    @staticmethod
+    def mark_as_used(token):
+
+        token.used_at = timezone.now()
+
+        token.save(update_fields=["used_at"])
+
+        

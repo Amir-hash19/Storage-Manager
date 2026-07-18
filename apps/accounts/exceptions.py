@@ -31,3 +31,20 @@ class OldPasswordMatchNewPassword(Exception):
 
 class UserDoesNotExists(Exception):
     pass    
+
+
+
+class InvalidResetPasswordToken(Exception):
+    pass
+
+
+
+
+
+class ResetPasswordTokenExpired(Exception):
+    pass
+
+
+
+class ResetPasswordTokenAlreadyUsed(Exception):
+    pass
