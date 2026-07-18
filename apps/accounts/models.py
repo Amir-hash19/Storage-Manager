@@ -119,3 +119,39 @@ class UserAccount(AbstractBaseUser,
     def full_name(self):
         return f"{self.first_name} {self.last_name}"    
 
+
+
+
+
+
+class PasswordResetToken(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+
+    user = models.ForeignKey(
+        UserAccount,
+        on_delete=models.CASCADE,
+        related_name="password_reset_tokens"
+    )
+
+    token_hash = models.CharField(
+        max_length=64,
+        unique=True
+    )
+
+    expires_at = models.DateTimeField()
+
+    used_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f"{self.user} - {self.created_at}"
