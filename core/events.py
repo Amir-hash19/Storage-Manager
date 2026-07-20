@@ -1,5 +1,5 @@
 from dataclasses import asdict
-from apps.accounts.tasks.user_tasks import process_audit_event, process_email_event
+from apps.accounts.tasks.user_tasks import process_audit_event
 from apps.audit.context import AuditContext
 from django.db import transaction
 
@@ -10,7 +10,6 @@ class EventBus:
 
     _publishers = (
         process_audit_event,
-        process_email_event,
     )
 
     @classmethod

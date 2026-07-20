@@ -69,23 +69,22 @@ class LogOutSerializer(serializers.Serializer):
 
 
 
-class ForgetPasswordSerializer(serializers.Serializer):
+class UserStorageSerializer(serializers.ModelSerializer):
 
-    email = serializers.EmailField()    
+    storage_quota_gb = serializers.SerializerMethodField()
+    used_storage_mb = serializers.SerializerMethodField()
 
+    class Meta:
+        model = UserAccount
+        fields = (
+            "storage_quota",
+            "used_storage",
+            "storage_quota_gb",
+            "used_storage_mb",
+        )
 
+    def get_storage_quota_gb(self, obj):
+        return round(obj.storage_quota / (1024 ** 3), 2)
 
-
-class ResetPasswordSerializer(serializers.Serializer):
-
-    token = serializers.CharField()
-
-    password = serializers.CharField(
-        write_only=True,
-        min_length=8,
-    )
-
-    confirm_password = serializers.CharField(
-        write_only=True,
-        min_length=8,
-    )
+    def get_used_storage_mb(self, obj):
+        return round(obj.used_storage / (1024 ** 2), 2)

@@ -2,15 +2,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import ResetPasswordSerializer,ForgetPasswordSerializer, LogOutSerializer, UserProfileSerializer,ChangePasswordSerializer,RegisterLoginResponseSerializer, UserResponseSerializer,LoginSerializer
-
+from .serializers import UserStorageSerializer, LogOutSerializer, UserProfileSerializer,ChangePasswordSerializer,RegisterLoginResponseSerializer, UserResponseSerializer,LoginSerializer
+from apps.accounts.services.retrive_user_storage import RetrieveUserStorageService
 from apps.accounts.services.create_user_service import RegisterUserService
-from apps.accounts.services.reset_password import ResetPasswordService
 from apps.accounts.services.login import LoginUserService
 from apps.accounts.services.profile import UserProfileService
 from apps.accounts.services.change_password import ChangePasswordService
-from apps.accounts.services.reset_password import ResetPasswordService
-from apps.accounts.services.forget_password import ForgetPasswordService
 from apps.accounts.services.logout import AuthService
 from apps.accounts.exceptions import UserEmailAlreadyExists, UserNameAlreadyExists, InvalidCredentials, InactiveUser
     
@@ -127,56 +124,16 @@ class LogOutView(APIView):
 
 
 
+class RetvieveUserStorageView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    serializer_class = UserStorageSerializer
 
-class ForgotPasswordView(APIView):
-
-    serializer_class = ForgetPasswordSerializer
-
-    def post(self, request):
-
-        serializer = self.serializer_class(
-            data=request.data
+    def get(self, request):
+        storage = RetrieveUserStorageService.execute(
+                request.user.id
         )
 
-        serializer.is_valid(raise_exception=True)
+        serializer = self.serializer_class(storage)
 
-        ForgetPasswordService().execute(
-            serializer.validated_data["email"]
-        )
-
-        return Response(
-            {
-                "detail":
-                "If the account exists, a password reset email has been sent."
-            },
-            status=status.HTTP_200_OK,
-        )
-    
-
-
-
-class ResetPasswordView(APIView):
-
-    serializer_class = ResetPasswordSerializer
-
-    def post(self, request):
-
-        serializer = self.serializer_class(
-            data=request.data
-        )
-
-        serializer.is_valid(raise_exception=True)
-
-        ResetPasswordService.execute(
-            token=serializer.validated_data["token"],
-            password=serializer.validated_data["password"],
-            confirm_password=serializer.validated_data["confirm_password"],
-        )
-
-        return Response(
-            {
-                "detail": "Password reset successfully."
-            },
-            status=status.HTTP_200_OK,
-        )
+        return Response(serializer.data, status=status.HTTP_200_OK)

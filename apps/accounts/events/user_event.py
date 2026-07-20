@@ -24,10 +24,3 @@ class UserChangedPasswordEvent:
     username: str
     
 
-
-
-@dataclass(slots=True)
-class PasswordResetRequestedEvent:
-    user_id: UUID
-    email: str
-    token: str

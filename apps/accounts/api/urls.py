@@ -1,7 +1,7 @@
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 from django.urls import path
-from .views import RegisterView, LoginView, ChangePasswordView, RetrieveUserView, LogOutView, ForgotPasswordView, ResetPasswordView
+from .views import RetvieveUserStorageView, RegisterView, LoginView, ChangePasswordView, RetrieveUserView, LogOutView
 
 
 urlpatterns = [
@@ -34,16 +34,13 @@ urlpatterns = [
         LogOutView.as_view(),
         name="user-logout"
     ),
+
     path(
-        "password/",
-        ForgotPasswordView.as_view(),
-        name="forget-password"
+        "storage/",
+        RetvieveUserStorageView.as_view(),
+        name="retrieve-user-storage"
     ),
-    path(
-        "reset-password/",
-        ResetPasswordView.as_view(),
-        name="reset-password"
-    ),
+
     
     path("verify-token/", TokenVerifyView.as_view(), name="verify-token"),
     path("refresh-token/", TokenRefreshView.as_view(), name="refresh-token")
