@@ -120,7 +120,6 @@ class File(BaseModel):
         indexes = [
             models.Index(fields=["owner"]),
             models.Index(fields=["folder"]),
-            models.Index(fields=["is_deleted"]),
             models.Index(fields=["owner", "folder"]),
             models.Index(fields=["created_at"]),
         ]

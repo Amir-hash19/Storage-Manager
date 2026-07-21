@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     #apps
     "apps.accounts.apps.AccountsConfig",
     "apps.audit.apps.AuditConfig",
+    "apps.storage.apps.StorageConfig",
    
 ]
 
