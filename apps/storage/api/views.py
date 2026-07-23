@@ -8,9 +8,9 @@ from .serializers import RenameFolderSerializer,CreateFolderSerialzer, FolderSer
 
 
 from apps.storage.services.rename_folder import RenameFolderService
-from apps.storage.services.create_folder import FolderService
-from apps.storage.services.folder_service import FolderService
-
+from apps.storage.services.create_folder import FolderCreateService
+from apps.storage.services.folder_service import FolderContentService
+from apps.storage.services.delete_folder import FolderDeleteService
 
 
 
@@ -27,7 +27,7 @@ class CreateFolderView(APIView):
 
         serializer.is_valid(raise_exception=True)
 
-        folder = FolderService.create_folder(
+        folder = FolderCreateService.create_folder(
             owner=request.user,
             **serializer.validated_data
         )
@@ -46,7 +46,7 @@ class FolderContentsView(APIView):
 
     def get(self, request, folder_id):
 
-        result = FolderService.get_contents(
+        result = FolderContentService.get_contents(
             owner=request.user,
             folder_id=folder_id
         )
@@ -86,4 +86,23 @@ class RenameFolderView(APIView):
                 },
             },
             status=status.HTTP_200_OK,
+        )
+
+
+
+
+
+class FolderDeleteView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, folder_id):
+        FolderDeleteService.delete(
+            folder_id=folder_id,
+            user=request.user
+        )
+
+        return Response(
+            {"details":"Folder Deleted Successfully."}
+            ,status=status.HTTP_204_NO_CONTENT
         )

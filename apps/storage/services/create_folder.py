@@ -7,7 +7,7 @@ from apps.storage.repositories.folder_repository import FolderRepository
 
 
 
-class FolderService:
+class FolderCreateService:
 
     @staticmethod
     def create_folder(

@@ -84,6 +84,22 @@ class FolderRepository:
             folders,
             ["path", "updated_at"],
         )        
+
+
+    @staticmethod
+    def soft_delete(folder: Folder):
+        folder.is_deleted = True
+        folder.save(update_fields=["is_deleted"])    
+
+
+    @staticmethod
+    def soft_delete_descendants(folder):
+        Folder.objects.filter(
+            owner=folder.owner,
+            path__startswith=folder.path,
+            is_deleted=False,
+        ).update(is_deleted=True)
+
     
     @staticmethod
     def create(**kwargs):

@@ -7,7 +7,7 @@ from apps.storage.repositories.folder_repository import FolderRepository
 
 
 
-class FolderService:
+class FolderContentService:
 
     @staticmethod
     def get_contents(*, owner, folder_id):

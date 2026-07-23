@@ -32,6 +32,11 @@ class Folder(BaseModel):
 
     is_deleted = models.BooleanField(default=False)
 
+    deleted_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
     class Meta:
         db_table = "folders"
 
