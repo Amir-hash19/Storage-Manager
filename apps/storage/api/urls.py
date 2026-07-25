@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import CreateFolderView, FolderContentsView, RenameFolderView, FolderDeleteView
+from .views import FolderRestoreView, CreateFolderView, FolderContentsView, RenameFolderView, FolderDeleteView
 
 
 
@@ -28,5 +28,11 @@ urlpatterns = [
         "folders/<uuid:folder_id>/delete/",
         FolderDeleteView.as_view(),
         name="folder-delete-by-user"
+    ),
+
+    path(
+        "folders/<uuid:folder_id>/restore/",
+        FolderRestoreView.as_view(),
+        name="folder-restore"
     )
 ]

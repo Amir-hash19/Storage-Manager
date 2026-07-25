@@ -11,7 +11,7 @@ from apps.storage.services.rename_folder import RenameFolderService
 from apps.storage.services.create_folder import FolderCreateService
 from apps.storage.services.folder_service import FolderContentService
 from apps.storage.services.delete_folder import FolderDeleteService
-
+from apps.storage.services.restore_folder import FolderRestoreService
 
 
 class CreateFolderView(APIView):
@@ -106,3 +106,26 @@ class FolderDeleteView(APIView):
             {"details":"Folder Deleted Successfully."}
             ,status=status.HTTP_204_NO_CONTENT
         )
+
+
+
+
+
+class FolderRestoreView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+
+    def post(self, request, folder_id):
+
+        FolderRestoreService.restore(
+            folder_id=folder_id,
+            user=request.user
+        )
+
+        return Response(
+            {"detail":"Folder Restored Successfully."},
+            status=status.HTTP_200_OK
+        )
+
+

@@ -42,12 +42,11 @@ class Folder(BaseModel):
 
         ordering = ("name",)
 
-        constraints = [
-            models.UniqueConstraint(
-                fields=["owner", "parent", "name"],
-                name="unique_folder_per_parent",
-            )
-        ]
+        models.UniqueConstraint(
+            fields=["owner", "parent", "name"],
+            condition=models.Q(is_deleted=False),
+            name="unique_active_folder_per_parent",
+        )
 
         indexes = [
             models.Index(fields=["owner"]),

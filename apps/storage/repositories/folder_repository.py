@@ -1,5 +1,5 @@
 from apps.storage.models import Folder
-
+from django.utils import timezone
 from typing import Optional
 
 
@@ -98,8 +98,30 @@ class FolderRepository:
             owner=folder.owner,
             path__startswith=folder.path,
             is_deleted=False,
-        ).update(is_deleted=True)
+        ).update(is_deleted=True, deleted_at=timezone.now())
 
+
+    @staticmethod
+    def restore_descendants(folder):
+        Folder.objects.filter(
+            owner=folder.owner,
+            path__startswith=folder.path,
+            is_deleted=True
+        ).update(
+            is_deleted=False,
+            deleted_at=None
+        )
+
+    @staticmethod
+    def get_deleted_by_id(folder_id):
+            return (
+                Folder.objects.filter(
+                    id=folder_id,
+                    is_deleted=True
+                )
+                .select_related("owner", "parent")
+                .first()
+            )
     
     @staticmethod
     def create(**kwargs):
