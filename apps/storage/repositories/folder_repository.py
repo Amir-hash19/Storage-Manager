@@ -1,6 +1,7 @@
 from apps.storage.models import Folder
 from django.utils import timezone
 from typing import Optional
+from django.db.models import Q
 
 
 
@@ -123,6 +124,52 @@ class FolderRepository:
                 .first()
             )
     
+    @staticmethod
+    def get_deleted_folders(owner):
+        return Folder.objects.filter(
+            owner=owner,
+            is_deleted=True
+        )
+
+    @staticmethod
+    def hard_delete(queryset):
+        queryset.delete()
+
+
+    @staticmethod
+    def list_trash(owner):
+        return Folder.objects.filter(
+            owner=owner,
+            is_deleted=True,
+        ).order_by("-deleted_at")
+
+
+    @staticmethod
+    def search_and_filter(
+        owner,
+        *,
+        search=None,
+        parent=None,
+        deleted=False,
+    ):
+        queryset = Folder.objects.filter(
+            owner=owner,
+            is_deleted=deleted,
+        )
+
+        if parent:
+            queryset = queryset.filter(parent_id=parent)
+
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search)
+            )
+
+        return queryset.order_by("name")    
+
+    
+
+
     @staticmethod
     def create(**kwargs):
         return Folder.objects.create(**kwargs)

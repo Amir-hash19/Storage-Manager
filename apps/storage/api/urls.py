@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import FolderRestoreView, CreateFolderView, FolderContentsView, RenameFolderView, FolderDeleteView
+from .views import FolderListView, TrashFolderListView, EmptyTrashView, FolderRestoreView, CreateFolderView, FolderContentsView, RenameFolderView, FolderDeleteView
 
 
 
@@ -34,5 +34,24 @@ urlpatterns = [
         "folders/<uuid:folder_id>/restore/",
         FolderRestoreView.as_view(),
         name="folder-restore"
+    ),
+
+    path(
+        "folders/trash/",
+        EmptyTrashView.as_view(),
+        name="empty-trash"
+    ),
+
+    path(
+        "folders/trash/list/",
+        TrashFolderListView.as_view(),
+        name="trash-list-folders"
+
+    ),
+
+    path(
+        "folders/list/",
+        FolderListView.as_view(),
+        name="folders-list"
     )
 ]

@@ -81,3 +81,19 @@ class RenameFolderSerializer(serializers.Serializer):
             )
 
         return value
+
+
+
+
+class FolderListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Folder
+        fields = (
+            "id",
+            "name",
+            "parent",
+            "path",
+            "created_at",
+            "deleted_at",
+        )

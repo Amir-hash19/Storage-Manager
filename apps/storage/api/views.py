@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 
-from .serializers import RenameFolderSerializer,CreateFolderSerialzer, FolderSerializer, FolderContentsSerializer
+from .serializers import RenameFolderSerializer,CreateFolderSerialzer, FolderSerializer, FolderContentsSerializer, FolderListSerializer
 
 
 from apps.storage.services.rename_folder import RenameFolderService
@@ -12,7 +12,8 @@ from apps.storage.services.create_folder import FolderCreateService
 from apps.storage.services.folder_service import FolderContentService
 from apps.storage.services.delete_folder import FolderDeleteService
 from apps.storage.services.restore_folder import FolderRestoreService
-
+from apps.storage.services.empty_trash_folder import FolderHardDeleteService
+from apps.storage.services.list_trash_folder import ListFolderTrashService
 
 class CreateFolderView(APIView):
 
@@ -129,3 +130,66 @@ class FolderRestoreView(APIView):
         )
 
 
+
+
+class EmptyTrashView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+
+        result = FolderHardDeleteService.empty_trash(request.user)
+
+        return Response(result, status=status.HTTP_204_NO_CONTENT)
+    
+
+
+
+class FolderListView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        search = request.query_params.get("search")
+        parent = request.query_params.get("parent")
+        deleted = (
+            request.query_params.get("deleted", "false").lower()
+            == "true"
+        )
+
+        folders = ListFolderTrashService.search_and_filter(
+            user=request.user,
+            search=search,
+            parent=parent,
+            deleted=deleted,
+        )
+
+        serializer = FolderListSerializer(
+            folders,
+            many=True,
+        )
+
+        return Response(serializer.data)
+
+
+
+
+
+
+class TrashFolderListView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        folders = ListFolderTrashService.list_trash(
+            request.user,
+        )
+
+        serializer = FolderListSerializer(
+            folders,
+            many=True,
+        )
+
+        return Response(serializer.data)
