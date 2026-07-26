@@ -10,3 +10,12 @@ class FolderNotFound(Exception):
 class FolderAlreadyExists(Exception):
     pass
 
+
+
+class FileAlreadyExists(Exception):
+    pass
+
+
+
+class StorageQuotaExceeded(Exception):
+    pass
