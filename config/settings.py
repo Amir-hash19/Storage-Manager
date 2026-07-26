@@ -170,3 +170,14 @@ SIMPLE_JWT = {
 
 CELERY_BROKER_URL = "redis://redis:6379/0"
 CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+
+
+
+
+
+
+MINIO_ENDPOINT = config("MINIO_ENDPOINT")
+MINIO_ACCESS_KEY = "minioadmin"
+MINIO_SECRET_KEY = "minioadmin"
+MINIO_BUCKET_NAME = config("MINIO_BUCKET_NAME")
+MINIO_USE_SSL = config("MINIO_USE_SSL", cast=bool, default=False)
