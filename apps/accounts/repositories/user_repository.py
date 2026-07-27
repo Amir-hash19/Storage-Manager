@@ -1,6 +1,7 @@
 from apps.accounts.models import UserAccount
 from apps.accounts.models import PasswordResetToken
 from django.utils import timezone
+from django.db.models import F
 
 
 
@@ -37,6 +38,22 @@ class UserRepository:
     @staticmethod
     def save(user):
         user.save(update_fields=["password"])
+
+
+
+    @staticmethod
+    def increase_used_storage(
+        *,
+        user_id,
+        size: int,
+    ):
+        UserAccount.objects.filter(
+            id=user_id
+        ).update(
+            used_storage=F("used_storage") + size
+        )  
+
+
     
     @staticmethod
     def create_user(**data)-> UserAccount:

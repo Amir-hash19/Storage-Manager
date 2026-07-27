@@ -3,8 +3,9 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from apps.storage.services.upload_file import UploadFileService
 
-from .serializers import RenameFolderSerializer,CreateFolderSerialzer, FolderSerializer, FolderContentsSerializer, FolderListSerializer
+from .serializers import FileUploadSerializer, RenameFolderSerializer,CreateFolderSerialzer, FolderSerializer, FolderContentsSerializer, FolderListSerializer
 
 
 from apps.storage.services.rename_folder import RenameFolderService
@@ -193,3 +194,29 @@ class TrashFolderListView(APIView):
         )
 
         return Response(serializer.data)
+
+
+
+
+
+
+class FileUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+
+        serializer = FileUploadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        UploadFileService.upload(
+            owner=request.user,
+            folder_id=serializer.validated_data["folder_id"],
+            uploaded_file=serializer.validated_data["file"],
+        )
+
+        return Response(
+            {
+                "detail": "Upload started."
+            },
+            status=status.HTTP_202_ACCEPTED,
+        )

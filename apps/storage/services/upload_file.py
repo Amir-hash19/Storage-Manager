@@ -3,15 +3,37 @@ import hashlib
 from django.db import transaction
 import uuid
 from apps.storage.models import FileStatus
-
+from apps.storage.events.storage_event import FileUploadRequestedEvent
+from apps.storage.services.temp_file_service import TempFileService
 from apps.storage.repositories.folder_repository import FolderRepository
 from apps.storage.repositories.file_repository import FileRepository
-from django import Path
-
+from pathlib import Path
+from core.events import EventBus
 
 class UploadFileService:
 
     @staticmethod
+    def _calculate_checksum(uploaded_file):
+            sha256 = hashlib.sha256()
+
+            for chunk in uploaded_file.chunks():
+                sha256.update(chunk)
+
+            uploaded_file.seek(0)
+
+            return sha256.hexdigest()
+
+
+    @staticmethod
+    def _generate_storage_key(
+            *,
+            owner_id,
+            extension,
+        ):
+            return f"users/{owner_id}/{uuid.uuid4()}{extension}"
+
+
+    @classmethod
     @transaction.atomic
     def upload(
         cls,
@@ -20,7 +42,7 @@ class UploadFileService:
         folder_id,
         uploaded_file
     ):
-        folder = FolderRepository.get_by_id(
+        folder = FolderRepository.get_by_id_owner(
             folder_id=folder_id,
             owner=owner
         )
@@ -62,22 +84,15 @@ class UploadFileService:
             status=FileStatus.PROCESSING,
         )
 
+        temp_path = TempFileService.save(uploaded_file)
 
-        @staticmethod
-        def _calculate_checksum(uploaded_file):
-            sha256 = hashlib.sha256()
+        EventBus.publish(
+            FileUploadRequestedEvent(
+                file_id=file.id,
+                temp_path=temp_path
+            )
+        )
 
-            for chunk in uploaded_file.chunks():
-                sha256.update(chunk)
+        return file
 
-            uploaded_file.seek(0)
 
-            return sha256.hexdigest()
-
-        @staticmethod
-        def _generate_storage_key(
-            *,
-            owner_id,
-            extension,
-        ):
-            return f"users/{owner_id}/{uuid.uuid4()}{extension}"

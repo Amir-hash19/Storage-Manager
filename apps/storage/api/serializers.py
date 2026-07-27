@@ -97,3 +97,17 @@ class FolderListSerializer(serializers.ModelSerializer):
             "created_at",
             "deleted_at",
         )
+
+
+
+
+
+class FileUploadSerializer(serializers.Serializer):
+    folder_id = serializers.UUIDField()
+    file = serializers.FileField()
+
+    def validate_file(self, value):
+        if value.size == 0:
+            raise serializers.ValidationError("Empty files are not allowed.")
+
+        return value        

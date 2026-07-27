@@ -38,6 +38,16 @@ class FolderRepository:
                 "owner",
                 "parent"
             ).first()
+
+
+    @staticmethod
+    def get_by_id_owner(folder_id, owner):
+        return Folder.objects.filter(
+                id=folder_id, is_deleted=False, owner=owner
+                ).select_related(
+                    "owner",
+                    "parent"
+                ).first()
         
     @staticmethod
     def exists_by_name(owner, parent, name):

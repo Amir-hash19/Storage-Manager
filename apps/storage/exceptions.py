@@ -1,5 +1,6 @@
 
-
+class FileNotFound(Exception):
+    pass
 
 
 class FolderNotFound(Exception):

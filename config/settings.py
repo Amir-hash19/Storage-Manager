@@ -177,7 +177,14 @@ CELERY_RESULT_BACKEND = "redis://redis:6379/0"
 
 
 MINIO_ENDPOINT = config("MINIO_ENDPOINT")
-MINIO_ACCESS_KEY = "minioadmin"
-MINIO_SECRET_KEY = "minioadmin"
+
+MINIO_ACCESS_KEY = config("MINIO_ACCESS_KEY")
+MINIO_SECRET_KEY = config("MINIO_SECRET_KEY")
+
 MINIO_BUCKET_NAME = config("MINIO_BUCKET_NAME")
-MINIO_USE_SSL = config("MINIO_USE_SSL", cast=bool, default=False)
+
+MINIO_USE_SSL = config(
+    "MINIO_USE_SSL",
+    cast=bool,
+    default=False
+)

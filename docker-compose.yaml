@@ -16,6 +16,7 @@ services:
       - .:/usr/src/app
       - static_volume:/usr/src/app/staticfiles
       - media_volume:/usr/src/app/media
+      - temp_volume:/tmp/storage
 
 
     depends_on:
@@ -118,6 +119,10 @@ services:
     depends_on:
       - redis
 
+    volumes:
+      - .:/usr/src/app
+      - temp_volume:/tmp/storage  
+
     networks:
       - backend
       - storage
@@ -165,6 +170,7 @@ volumes:
   minio_data:
   static_volume:
   media_volume:  
+  temp_volume:
 
 
 
