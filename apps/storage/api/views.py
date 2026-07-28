@@ -3,18 +3,17 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from apps.storage.services.upload_file import UploadFileService
-
 from .serializers import FileUploadSerializer, RenameFolderSerializer,CreateFolderSerialzer, FolderSerializer, FolderContentsSerializer, FolderListSerializer
 
-
-from apps.storage.services.rename_folder import RenameFolderService
-from apps.storage.services.create_folder import FolderCreateService
+from apps.storage.services.folder_services.rename_folder import RenameFolderService
+from apps.storage.services.folder_services.create_folder import FolderCreateService
 from apps.storage.services.folder_service import FolderContentService
-from apps.storage.services.delete_folder import FolderDeleteService
-from apps.storage.services.restore_folder import FolderRestoreService
-from apps.storage.services.empty_trash_folder import FolderHardDeleteService
-from apps.storage.services.list_trash_folder import ListFolderTrashService
+from apps.storage.services.folder_services.delete_folder import FolderDeleteService
+from apps.storage.services.folder_services.restore_folder import FolderRestoreService
+from apps.storage.services.folder_services.empty_trash_folder import FolderHardDeleteService
+from apps.storage.services.folder_services.list_trash_folder import ListFolderTrashService
+
+from apps.storage.services.upload_file import UploadFileService
 
 class CreateFolderView(APIView):
 

@@ -1,28 +1,11 @@
 from datetime import timedelta
-
 from django.conf import settings
 from minio import Minio
 from minio.commonconfig import CopySource
 from minio.error import S3Error
 
-class StorageException(Exception):
-    """Base exception for storage backend."""
-
-
-class StorageUploadException(StorageException):
-    pass
-
-
-class StorageDeleteException(StorageException):
-    pass
-
-
-class StorageDownloadException(StorageException):
-    pass
-
-
-class StorageObjectNotFound(StorageException):
-    pass
+from apps.storage.exceptions import( StorageException, StorageUploadException,
+StorageDeleteException, StorageDownloadException, StorageObjectNotFound )
 
 class MinioStorageService:
 
