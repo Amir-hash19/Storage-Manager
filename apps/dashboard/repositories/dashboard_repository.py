@@ -1,6 +1,6 @@
 from apps.accounts.models import UserAccount,UserRole
 from apps.storage.models import Folder, File, ShareLink, FileStatus
-
+from apps.audit.models import AuditLog
 from django.db.models import Count, Q, Sum
 
 
@@ -61,5 +61,13 @@ class DashBoardRepository:
             )[:limit]
         )
 
+    @staticmethod
+    def get_logs():
+        return (
+            AuditLog.objects.select_related(
+                "user"
+            )
+            .all()
+        )
     
 

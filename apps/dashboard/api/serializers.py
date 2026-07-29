@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+from apps.audit.models import AuditLog
 
 
 class DashboardUsersStatisticsSerializer(serializers.Serializer):
@@ -25,3 +25,21 @@ class DashboardStorageSerializer(serializers.Serializer):
     usage_percent = serializers.FloatField()
     average_usage_per_user = serializers.IntegerField()
     top_users = TopStorageUserSerializer(many=True)
+
+
+
+
+
+class AuditSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AuditLog
+        fields = (
+            "id",
+            "user",
+            "action",
+            "resource",
+            "status",
+            "ip_address",
+            "created_at",
+        )

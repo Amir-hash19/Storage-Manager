@@ -1,7 +1,6 @@
 from apps.dashboard.repositories.dashboard_repository import DashBoardRepository
 
 
-
 class DashBoardUserStatisticsService:
 
     @classmethod
@@ -44,3 +43,11 @@ class DashBoardStorageService:
             ),
             "top_users": list(top_users),
         }    
+
+
+
+class DashBoardAuditService:
+
+    @classmethod
+    def execute(cls):
+        return  DashBoardRepository.get_logs()   

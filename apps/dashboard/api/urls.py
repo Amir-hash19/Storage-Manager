@@ -1,7 +1,7 @@
 from django.urls import path
 
 
-from .views import DashboardUsersView, DashboardStorageView
+from .views import DashboardUsersView, DashboardStorageView, DashboardAuditView
 
 urlpatterns = [
     path(
@@ -14,5 +14,12 @@ urlpatterns = [
         "users/storage/",
         DashboardStorageView.as_view(),
         name="storage-statics"
+    ),
+
+    path(
+        "users/activities/",
+        DashboardAuditView.as_view(),
+        name="users-search-filters"
+        
     )    
 ]
