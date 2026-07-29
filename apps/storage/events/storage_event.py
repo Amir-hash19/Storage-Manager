@@ -13,3 +13,8 @@ class FileUploadRequestedEvent:
 class FileUploadedEvent:
     file_id : UUID
     owner_id : UUID
+
+
+@dataclass(slots=True)
+class VirusScanRequestedEvent:
+    file_id : UUID

@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "apps.accounts.apps.AccountsConfig",
     "apps.audit.apps.AuditConfig",
     "apps.storage.apps.StorageConfig",
+    "apps.dashboard.apps.DashboardConfig",
    
 ]
 
