@@ -49,6 +49,11 @@ The project is fully containerized with **Docker Compose** and designed for scal
 | Event Driven | Loose Coupling |
 
 ---
+## Obejct Storge Dashboard 
+
+<p align="center">
+  <img src="docs/object_storage.png" width="900" alt="Dashboard">
+</p>
 
 # Project Structure
 
