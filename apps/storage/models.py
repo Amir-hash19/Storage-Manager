@@ -109,6 +109,8 @@ class File(BaseModel):
     default=FileStatus.ACTIVE,
     )
 
+    is_deleted = models.BooleanField(default=False)
+
     class Meta:
         db_table = "files"
 

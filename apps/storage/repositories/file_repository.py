@@ -50,7 +50,25 @@ class FileRepository:
     def hard_delete(file):
         file.delete()
 
+
+    @staticmethod
+    def get_active_by_id(file_id, owner):
+        return (
+            File.objects.select_related("owner", "folder")
+            .filter(
+                id=file_id,
+                owner=owner,
+                status=FileStatus.ACTIVE,
+                is_deleted=False
+            )
+            .first()
+        )    
+
         
     @staticmethod
     def create(**kwargs)-> File:
         return File.objects.create(**kwargs)
+
+
+
+

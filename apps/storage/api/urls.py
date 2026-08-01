@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import FileUploadView,FolderListView, TrashFolderListView, EmptyTrashView, FolderRestoreView, CreateFolderView, FolderContentsView, RenameFolderView, FolderDeleteView
+from .views import TestView, DownloadfileView, FileUploadView,FolderListView, TrashFolderListView, EmptyTrashView, FolderRestoreView, CreateFolderView, FolderContentsView, RenameFolderView, FolderDeleteView
 
 
 
@@ -59,5 +59,13 @@ urlpatterns = [
         "file/upload/",
         FileUploadView.as_view(),
         name="file-upload"
-    )
+    ),
+
+    path(
+        "file/download/<int:file_id>/",
+        DownloadfileView.as_view(),
+        name="download-file"
+    ),
+
+    path("test/", TestView.as_view()),
 ]

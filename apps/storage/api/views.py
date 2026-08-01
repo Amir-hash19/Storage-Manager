@@ -12,6 +12,7 @@ from apps.storage.services.folder_services.delete_folder import FolderDeleteServ
 from apps.storage.services.folder_services.restore_folder import FolderRestoreService
 from apps.storage.services.folder_services.empty_trash_folder import FolderHardDeleteService
 from apps.storage.services.folder_services.list_trash_folder import ListFolderTrashService
+from apps.storage.services.download_file import DownloadFileService
 
 from apps.storage.services.upload_file import UploadFileService
 
@@ -219,3 +220,24 @@ class FileUploadView(APIView):
             },
             status=status.HTTP_202_ACCEPTED,
         )
+
+
+
+
+class DownloadfileView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, file_id):
+        return DownloadFileService.execute(
+            file_id=file_id,
+            user=request.user
+        )
+
+
+
+
+
+class TestView(APIView):
+    def get(self, request):
+        return Response({"ok": True})
