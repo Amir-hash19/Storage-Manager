@@ -1,5 +1,4 @@
 from apps.accounts.models import UserAccount
-from apps.accounts.models import PasswordResetToken
 from django.utils import timezone
 from django.db.models import F
 
