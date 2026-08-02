@@ -111,3 +111,51 @@ class FileUploadSerializer(serializers.Serializer):
             raise serializers.ValidationError("Empty files are not allowed.")
 
         return value        
+    
+
+
+
+
+
+class FileListSerializer(serializers.ModelSerializer):
+    folder_name = serializers.CharField(source="folder.name", read_only=True)
+
+    class Meta:
+        model = File
+        fields = (
+            "id",
+            "file_name",
+            "extension",
+            "mime_type",
+            "size",
+            "status",
+            "folder",
+            "folder_name",
+            "created_at",
+        )
+
+
+
+
+class FileDetailSerializer(serializers.ModelSerializer):
+    folder = serializers.SerializerMethodField()
+
+    class Meta:
+        model = File
+        fields = (
+            "id",
+            "file_name",
+            "extension",
+            "mime_type",
+            "size",
+            "checksum",
+            "status",
+            "folder",
+            "created_at",
+        )
+
+    def get_folder(self, obj):
+        return {
+            "id": obj.folder.id,
+            "name": obj.folder.name,
+        }

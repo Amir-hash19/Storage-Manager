@@ -2,8 +2,19 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import mixins
+from rest_framework.viewsets import GenericViewSet
+from rest_framework import viewsets
+from rest_framework.filters import SearchFilter
+from rest_framework.filters import OrderingFilter
 
-from .serializers import FileUploadSerializer, RenameFolderSerializer,CreateFolderSerialzer, FolderSerializer, FolderContentsSerializer, FolderListSerializer
+from .serializers import( FileListSerializer,FileDetailSerializer, FileUploadSerializer,
+RenameFolderSerializer,CreateFolderSerialzer,
+FolderSerializer, FolderContentsSerializer, FolderListSerializer )
+
+from .filters import FileFilter
+
 
 from apps.storage.services.folder_services.rename_folder import RenameFolderService
 from apps.storage.services.folder_services.create_folder import FolderCreateService
@@ -13,7 +24,7 @@ from apps.storage.services.folder_services.restore_folder import FolderRestoreSe
 from apps.storage.services.folder_services.empty_trash_folder import FolderHardDeleteService
 from apps.storage.services.folder_services.list_trash_folder import ListFolderTrashService
 from apps.storage.services.download_file import DownloadFileService
-
+from apps.storage.services.file_service import FileService
 from apps.storage.services.upload_file import UploadFileService
 
 class CreateFolderView(APIView):
@@ -238,6 +249,38 @@ class DownloadfileView(APIView):
 
 
 
-class TestView(APIView):
-    def get(self, request):
-        return Response({"ok": True})
+class FileViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    GenericViewSet
+    ):
+    
+    permission_classes = [IsAuthenticated]
+
+    filter_backends = (
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter,
+    )
+
+    ordering_fields = (
+        "created_at",
+        "size",
+        "file_name",
+    )
+
+    ordering = ("-created_at",)
+
+    filterset_class = FileFilter
+
+    def get_queryset(self):
+        return FileService.get_files(
+            owner=self.request.user,
+        )
+    
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return FileDetailSerializer
+
+        return FileListSerializer

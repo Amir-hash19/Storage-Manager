@@ -1,4 +1,5 @@
 from apps.storage.models import File, FileStatus
+from django.db.models import QuerySet
 
 
 
@@ -63,6 +64,17 @@ class FileRepository:
             )
             .first()
         )    
+
+    @staticmethod
+    def get_queryset(*, owner) -> QuerySet[File]:
+        return (
+            File.objects
+            .select_related("folder")
+            .filter(
+                owner=owner,
+                is_deleted=False
+            )
+        )
 
         
     @staticmethod
