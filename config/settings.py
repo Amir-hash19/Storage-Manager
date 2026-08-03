@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "django_filters",
     "drf_spectacular",
+    "django_prometheus",
 
     #apps
     "apps.accounts.apps.AccountsConfig",
@@ -58,6 +59,8 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = "accounts.UserAccount"
 
 MIDDLEWARE = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
+    
     "apps.audit.middleware.AuditContextMiddleware",
     
     "django.middleware.security.SecurityMiddleware",

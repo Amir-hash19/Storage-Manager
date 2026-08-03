@@ -38,8 +38,8 @@ services:
       --threads 2
       --timeout 120
       "
-    expose:
-      - "8000"
+    ports:
+      - "8000:8000"
 
 
     networks:
