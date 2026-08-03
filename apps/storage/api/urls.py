@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import FileViewSet, DownloadfileView, FileUploadView,FolderListView, TrashFolderListView, EmptyTrashView, FolderRestoreView, CreateFolderView, FolderContentsView, RenameFolderView, FolderDeleteView
+from .views import FileRestoreView,FileDeleteView, FileViewSet, DownloadfileView, FileUploadView,FolderListView, TrashFolderListView, EmptyTrashView, FolderRestoreView, CreateFolderView, FolderContentsView, RenameFolderView, FolderDeleteView
 
 router = DefaultRouter()
 
@@ -73,6 +73,19 @@ urlpatterns = [
         name="download-file"
     ),
 
+    path(
+        "file/<int:file_id>/delete/",
+        FileDeleteView.as_view(),
+        name="file-delete"
+    ),
+
+    path(
+        "file/<int:file_id>/restore/",
+        FileRestoreView.as_view(),
+        name="file-restore"
+    )
+    ,
+   
     path(
         "",
         include(router.urls)

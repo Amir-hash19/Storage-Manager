@@ -284,3 +284,36 @@ class FileViewSet(
             return FileDetailSerializer
 
         return FileListSerializer
+
+
+
+
+class FileDeleteView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, file_id):
+        FileService.soft_delete(
+            owner=request.user,
+            file_id=file_id
+        )
+
+        return Response(
+            {"detail":"Object deleted Successfully."}
+            ,status=status.HTTP_204_NO_CONTENT
+        )
+
+
+
+class FileRestoreView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, file_id):
+
+        FileService.restore(
+            owner=request.user,
+            file_id=file_id
+        )
+
+        return Response(status=status.HTTP_200_OK)

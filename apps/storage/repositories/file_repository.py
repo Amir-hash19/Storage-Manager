@@ -60,7 +60,7 @@ class FileRepository:
                 id=file_id,
                 owner=owner,
                 status=FileStatus.ACTIVE,
-                is_deleted=False
+                
             )
             .first()
         )    
@@ -72,9 +72,26 @@ class FileRepository:
             .select_related("folder")
             .filter(
                 owner=owner,
-                is_deleted=False
+                status=FileStatus.ACTIVE
             )
         )
+
+    @classmethod
+    def get_deleted_by_id(cls, *, owner, file_id):
+        return (
+            File.objects
+            .select_related("folder")
+            .filter(
+                id=file_id,
+                owner=owner,
+                status=FileStatus.DELETED,
+            )
+            .first()
+        )
+
+    @staticmethod
+    def save(*, file):
+        file.save(update_fields=["status","updated_at"])    
 
         
     @staticmethod
