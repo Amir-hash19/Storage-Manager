@@ -10,9 +10,19 @@ from apps.accounts.services.profile import UserProfileService
 from apps.accounts.services.change_password import ChangePasswordService
 from apps.accounts.services.logout import AuthService
 from apps.accounts.exceptions import UserEmailAlreadyExists, UserNameAlreadyExists, InvalidCredentials, InactiveUser
+
+
+from drf_spectacular.utils import extend_schema
     
 
 class RegisterView(APIView):
+
+    @extend_schema(
+    request=UserResponseSerializer,
+    responses={
+            201: RegisterLoginResponseSerializer
+        }
+    )
     
     def post(self, request):
         serializer = UserResponseSerializer(data=request.data)

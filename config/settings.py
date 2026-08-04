@@ -59,7 +59,7 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = "accounts.UserAccount"
 
 MIDDLEWARE = [
-    'django_prometheus.middleware.PrometheusBeforeMiddleware',
+    
     
     "apps.audit.middleware.AuditContextMiddleware",
     
@@ -141,8 +141,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = "static/"
+
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -155,6 +160,8 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+
 
 }
 
@@ -192,3 +199,20 @@ MINIO_USE_SSL = config(
     cast=bool,
     default=False
 )
+
+
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Storage Manager API",
+    "DESCRIPTION": "REST API documentation for Storage Manager.",
+    "VERSION": "1.0.0",
+
+    "SERVE_INCLUDE_SCHEMA": False,
+
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "persistAuthorization": True,
+    },
+
+    "COMPONENT_SPLIT_REQUEST": True,
+}
