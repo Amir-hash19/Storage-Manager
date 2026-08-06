@@ -27,11 +27,28 @@ from apps.storage.services.download_file import DownloadFileService
 from apps.storage.services.file_service import FileService
 from apps.storage.services.upload_file import UploadFileService
 
+
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiExample,
+    OpenApiResponse,
+)
+
+from drf_spectacular.utils import extend_schema
+
 class CreateFolderView(APIView):
 
     permission_classes = [IsAuthenticated]
 
 
+    @extend_schema(
+        summary="create folder",
+        description="Create folder by users.",
+    request=CreateFolderSerialzer,
+    responses={
+            201: FolderSerializer
+        }
+    )
     def post(self, request):
 
         serializer = CreateFolderSerialzer(
@@ -53,10 +70,14 @@ class CreateFolderView(APIView):
 
 
 class FolderContentsView(APIView):
-
     permission_classes = [IsAuthenticated]
 
-
+    @extend_schema(
+            request=FolderContentsSerializer,
+            responses={
+                200: FolderContentsSerializer
+            }
+    )
     def get(self, request, folder_id):
 
         result = FolderContentService.get_contents(
@@ -76,6 +97,14 @@ class RenameFolderView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+            summary="rename folder",
+            description="rename folder by users.",
+        request=RenameFolderSerializer,
+        responses={
+            200: FolderSerializer
+        }
+    )
     def patch(self, request, folder_id):
         serializer = RenameFolderSerializer(
             data=request.data
@@ -109,6 +138,10 @@ class FolderDeleteView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        summary="delete folder",
+        description="delete folder by users."
+    )
     def delete(self, request, folder_id):
         FolderDeleteService.delete(
             folder_id=folder_id,
@@ -129,6 +162,10 @@ class FolderRestoreView(APIView):
     permission_classes = [IsAuthenticated]
 
 
+    @extend_schema(
+        summary="restore folder",
+        description="restore folder by users."
+    )
     def post(self, request, folder_id):
 
         FolderRestoreService.restore(
@@ -148,6 +185,10 @@ class EmptyTrashView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        summary="empty trash",
+        description="empty trash by users."
+    )
     def delete(self, request):
 
         result = FolderHardDeleteService.empty_trash(request.user)
@@ -161,6 +202,14 @@ class FolderListView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=FolderListSerializer,
+        responses={
+            200: FolderListSerializer
+        },    
+        summary="list folders",
+        description="list folders by users."
+    )
     def get(self, request):
 
         search = request.query_params.get("search")
@@ -193,6 +242,14 @@ class TrashFolderListView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+            summary="list trash folders",
+            description="list trash folders by users.",
+        request=FolderListSerializer,
+        responses={
+            200: FolderListSerializer
+        }
+    )
     def get(self, request):
 
         folders = ListFolderTrashService.list_trash(
@@ -213,6 +270,13 @@ class TrashFolderListView(APIView):
 
 class FileUploadView(APIView):
     permission_classes = [IsAuthenticated]
+
+
+    @extend_schema(
+        request=FileUploadSerializer,
+        summary="upload file",
+        description="upload file by users."
+    )
 
     def post(self, request):
 
@@ -239,6 +303,10 @@ class DownloadfileView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        summary="download file",
+        description="download file by users."
+    )
     def get(self, request, file_id):
         return DownloadFileService.execute(
             file_id=file_id,
@@ -272,7 +340,7 @@ class FileViewSet(
     ordering = ("-created_at",)
 
     filterset_class = FileFilter
-
+    
     def get_queryset(self):
         return FileService.get_files(
             owner=self.request.user,
@@ -292,6 +360,10 @@ class FileDeleteView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        summary="delete file",
+        description="delete file by users."
+    )
     def delete(self, request, file_id):
         FileService.soft_delete(
             owner=request.user,
@@ -309,6 +381,10 @@ class FileRestoreView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        summary="restore file",
+        description="restore file by users."
+    )
     def post(self, request, file_id):
 
         FileService.restore(

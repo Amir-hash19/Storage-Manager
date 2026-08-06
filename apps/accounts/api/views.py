@@ -12,12 +12,30 @@ from apps.accounts.services.logout import AuthService
 from apps.accounts.exceptions import UserEmailAlreadyExists, UserNameAlreadyExists, InvalidCredentials, InactiveUser
 
 
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiExample,
+    OpenApiResponse,
+)
+
 from drf_spectacular.utils import extend_schema
     
 
 class RegisterView(APIView):
 
     @extend_schema(
+        summary="User Registration",
+        description="""
+    Create User Account.
+
+    Response:
+        status code 201
+        JWT Tokens 
+        user account data    
+
+    The frontend does not need to store tokens manually.
+    They will be sent automatically with subsequent requests.    
+        """,
     request=UserResponseSerializer,
     responses={
             201: RegisterLoginResponseSerializer
@@ -52,6 +70,41 @@ class RegisterView(APIView):
 
 
 class LoginView(APIView):
+
+    
+    @extend_schema(
+        summary="User Login",
+        description="""
+    Authenticate user using email and password.
+
+    On success:
+    - Returns user information.
+    - Sets JWT access and refresh tokens in HttpOnly cookies.
+
+    The frontend does not need to store tokens manually.
+    They will be sent automatically with subsequent requests.
+    """,
+        request=LoginSerializer,
+        responses={
+            200: RegisterLoginResponseSerializer,
+            401: OpenApiResponse(
+                description="Invalid email or password."
+            ),
+            403: OpenApiResponse(
+                description="User account is inactive."
+            ),
+        },
+        examples=[
+            OpenApiExample(
+                "Request",
+                value={
+                    "email": "john@example.com",
+                    "password": "StrongPassword123"
+                },
+                request_only=True,
+            )
+        ]
+    )
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -82,8 +135,31 @@ class LoginView(APIView):
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=ChangePasswordSerializer,
+        responses={
+            200: OpenApiResponse(
+                description="Password changed successfully."
+            ),
+            401: OpenApiResponse(
+                description="Unauthorized."
+            ),
+            403: OpenApiResponse(
+                description="User account is inactive."
+            ),},
+        summary="Change Password",
+        description="""
+    Authenticated users can access this endpoint.
+    enter the current password.
+    then enter the new password and password confirmation.    
 
-    def post(seld, request):
+    Response:
+        status code 200,
+        "message":"Password Changed Successfully."
+        
+        """
+    )
+    def post(self, request):
         serializer = ChangePasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -101,7 +177,17 @@ class ChangePasswordView(APIView):
 class RetrieveUserView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=UserProfileSerializer,
+        summary="Get User Profile",
+        description="""
+    Authenticated client can access this endpoint.
 
+    retrun:
+        user data,
+        status code 200    
+        """
+    )
     def get(self, request):
         user = UserProfileService().get_user_profile(request.user)
         serializer = UserProfileSerializer(user)
@@ -116,6 +202,13 @@ class RetrieveUserView(APIView):
 class LogOutView(APIView):
     permission_classes = [IsAuthenticated]
 
+
+    @extend_schema(
+        request=LogOutSerializer,
+        summary="logout",
+        description="client can log out ."
+
+    )
     def post(self, request):
         serializer = LogOutSerializer(data=request.data)
 
@@ -136,9 +229,14 @@ class LogOutView(APIView):
 
 class RetvieveUserStorageView(APIView):
     permission_classes = [IsAuthenticated]
-
     serializer_class = UserStorageSerializer
 
+    @extend_schema(
+        request=UserStorageSerializer,
+        summary="Get user storage usage",
+        description="return users storage usage"
+
+    )
     def get(self, request):
         storage = RetrieveUserStorageService.execute(
                 request.user.id

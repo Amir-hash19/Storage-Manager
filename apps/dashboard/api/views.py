@@ -15,11 +15,28 @@ from apps.dashboard.api.serializers import (
     DashboardUsersStatisticsSerializer,DashboardStorageSerializer, AuditSerializer
 )
 
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiExample,
+    OpenApiResponse,
+)
+
+from drf_spectacular.utils import extend_schema
+
 
 
 class DashboardUsersView(APIView):
 
     permission_classes = [IsAdminUser]
+
+    @extend_schema(
+            summary="users statistics.",
+            description="admin user can see the user statistic like storage usage emaning storage and more...",
+            request=DashboardUsersStatisticsSerializer,
+            responses={
+                202: DashboardUsersStatisticsSerializer
+            }
+    )
 
     def get(self, request):
         data = DashBoardUserStatisticsService.execute()
@@ -34,12 +51,21 @@ class DashboardUsersView(APIView):
 class DashboardStorageView(APIView):
     permission_classes = [IsAdminUser]
 
+
+    @extend_schema(
+            summary="Storage Statistics",
+            description="admin user can check the storage statistics.",
+            request=DashboardStorageSerializer,
+            responses={
+                200: DashboardStorageSerializer
+            }
+    )
     def get(self, request):
         data = DashBoardStorageService.execute()
 
         serializer = DashboardStorageSerializer(data)
 
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 
 
