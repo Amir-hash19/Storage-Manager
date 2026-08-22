@@ -198,6 +198,7 @@ services:
     networks:
       - frontend  
       - monitoring
+      - backend
 
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro

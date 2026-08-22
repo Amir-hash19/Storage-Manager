@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import FileRestoreView,FileDeleteView, FileViewSet, DownloadfileView, FileUploadView,FolderListView, TrashFolderListView, EmptyTrashView, FolderRestoreView, CreateFolderView, FolderContentsView, RenameFolderView, FolderDeleteView
+from .views import ShareLinkCreateAPIView, FileRestoreView,FileDeleteView, FileViewSet, DownloadfileView, FileUploadView,FolderListView, TrashFolderListView, EmptyTrashView, FolderRestoreView, CreateFolderView, FolderContentsView, RenameFolderView, FolderDeleteView
 
 router = DefaultRouter()
 
@@ -83,9 +83,14 @@ urlpatterns = [
         "file/<int:file_id>/restore/",
         FileRestoreView.as_view(),
         name="file-restore"
-    )
-    ,
-   
+    ),
+
+    path(
+        "files/<int:file_id>/share-links/",
+        ShareLinkCreateAPIView.as_view(),
+        name="create-share-links"
+    ),
+
     path(
         "",
         include(router.urls)

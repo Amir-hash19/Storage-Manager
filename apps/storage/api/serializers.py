@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.storage.models import Folder, File, FileStatus
+from apps.storage.models import Folder, File, FileStatus, ShareLink
 
 
 class CreateFolderSerialzer(serializers.Serializer):
@@ -159,3 +159,26 @@ class FileDetailSerializer(serializers.ModelSerializer):
             "id": obj.folder.id,
             "name": obj.folder.name,
         }
+    
+
+
+
+
+class ShareLinkCreateSerializer(serializers.Serializer):
+
+    password = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        write_only=True,
+    )
+
+    expires_at = serializers.DateTimeField(
+        required=False,
+        allow_null=True,
+    )
+
+    max_downloads = serializers.IntegerField(
+        required=False,
+        min_value=0,
+        default=0,
+    )

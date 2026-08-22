@@ -8,13 +8,15 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.filters import OrderingFilter
+from django.shortcuts import get_object_or_404
 
 from .serializers import( FileListSerializer,FileDetailSerializer, FileUploadSerializer,
 RenameFolderSerializer,CreateFolderSerialzer,
-FolderSerializer, FolderContentsSerializer, FolderListSerializer )
+FolderSerializer, FolderContentsSerializer, FolderListSerializer, ShareLinkCreateSerializer )
 
 from .filters import FileFilter
 
+from apps.storage.models import File
 
 from apps.storage.services.folder_services.rename_folder import RenameFolderService
 from apps.storage.services.folder_services.create_folder import FolderCreateService
@@ -26,6 +28,7 @@ from apps.storage.services.folder_services.list_trash_folder import ListFolderTr
 from apps.storage.services.download_file import DownloadFileService
 from apps.storage.services.file_service import FileService
 from apps.storage.services.upload_file import UploadFileService
+from apps.storage.services.sharelink.share_link_service import ShareLinkService
 
 
 from drf_spectacular.utils import (
@@ -393,3 +396,56 @@ class FileRestoreView(APIView):
         )
 
         return Response(status=status.HTTP_200_OK)
+    
+
+
+
+
+class ShareLinkCreateAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, file_id):
+
+        file = get_object_or_404(
+            File,
+            id=file_id,
+        )
+
+        serializer = ShareLinkCreateSerializer(
+            data=request.data,
+        )
+
+        serializer.is_valid(
+            raise_exception=True,
+        )
+
+        service = ShareLinkService()
+
+        try:
+            share_link = service.create_share_link(
+                file=file,
+                user=request.user,
+                **serializer.validated_data,
+            )
+
+        except PermissionError as exc:
+            return Response(
+                {"detail": str(exc)},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        return Response(
+            {
+                "id": share_link.id,
+                "token": str(share_link.token),
+                "share_url": (
+                    f"/share/{share_link.token}/"
+                ),
+                "expires_at": share_link.expires_at,
+                "max_downloads": share_link.max_downloads,
+                "download_count": share_link.download_count,
+                "is_active": share_link.is_active,
+            },
+            status=status.HTTP_201_CREATED,
+        )
