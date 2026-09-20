@@ -23,11 +23,6 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       containers:
-        # securityContext:
-        #   allowPrivilegeEscalation: false
-        #   capabilities:
-        #     drop:
-        #       - ALL
         - name: celery-beat
           image: localhost:5000/storage-manager:latest
           imagePullPolicy: IfNotPresent

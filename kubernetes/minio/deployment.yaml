@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: storage-manager
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: minio
+
+  template:
+    metadata:
+      labels:
+        app: minio
+
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+
+      containers:
+        - name: minio
+
+          image: localhost:5000/minio:RELEASE.2025-04-03T14-56-28Z
+          imagePullPolicy: IfNotPresent
+
+          command:
+            - minio
+
+          args:
+            - server
+            - /data
+            - --console-address
+            - ":9001"
+
+          envFrom:
+            - secretRef:
+                name: minio-secret
+
+          ports:
+            - name: api
+              containerPort: 9000
+
+            - name: console
+              containerPort: 9001
+
+          volumeMounts:
+            - name: minio-data
+              mountPath: /data
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+      volumes:
+        - name: minio-data
+          persistentVolumeClaim:
+            claimName: minio-pvc
