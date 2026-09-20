@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery
+  namespace: storage-manager
+  labels:
+    app: celery
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: celery
+
+  template:
+    metadata:
+      labels:
+        app: celery
+
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+
+      containers:
+        - name: celery
+          image: localhost:5000/storage-manager:latest
+          imagePullPolicy: IfNotPresent
+
+          command:
+            - celery
+            - -A
+            - config
+            - worker
+            - --loglevel=info
+
+          envFrom:
+            - configMapRef:
+                name: django-config
+            - secretRef:
+                name: django-secret
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - celery -A config inspect ping
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
