@@ -1,7 +1,7 @@
 from django.urls import path
 
 
-from .views import DashboardUsersView, DashboardStorageView, DashboardAuditView
+from .views import liveness, readiness, DashboardUsersView, DashboardStorageView, DashboardAuditView
 
 urlpatterns = [
     path(
@@ -21,5 +21,8 @@ urlpatterns = [
         DashboardAuditView.as_view(),
         name="users-search-filters"
         
-    )    
+    ),
+
+    path("liveness/", liveness, name="liveness-prob"),
+    path("readiness/", readiness, name="readiness-prob")    
 ]

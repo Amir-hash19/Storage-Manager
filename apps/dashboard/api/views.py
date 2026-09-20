@@ -7,6 +7,8 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework import status
 from .filters import AuditLogFilter
 from core.paginations import DefaultPagination
+from django.db import connection
+from django.http import JsonResponse
 
 from apps.dashboard.services.dashboard_service import (
     DashBoardUserStatisticsService,DashBoardStorageService, DashBoardAuditService
@@ -103,3 +105,27 @@ class DashboardAuditView(ListAPIView):
 
     def get_queryset(self):
         return DashBoardAuditService.execute()
+    
+
+
+
+
+
+
+#liveness Prob
+
+def liveness(request):
+    return JsonResponse({"status": "OK"})
+
+
+
+
+#readiness Prob
+def readiness(request):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+
+        return JsonResponse({"status": "Ready!"})
+    except Exception:
+        return JsonResponse({"status": "not ready"}, status=503)

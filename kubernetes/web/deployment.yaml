@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django
+  namespace: storage-manager
+
+spec:
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: django
+
+  template:
+    metadata:
+      labels:
+        app: django
+
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+
+      containers:
+        - name: django
+          image: localhost:5000/storage-manager:latest
+
+          ports:
+            - name: http
+              containerPort: 8000
+
+          envFrom:
+            - configMapRef:
+                name: django-config
+
+            - secretRef:
+                name: django-secret
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+
+          resources:
+            requests:
+              cpu: 500m
+              memory: 256Mi
+
+            limits:
+              cpu: "1"
+              memory: 1Gi
+
+          readinessProbe:
+            httpGet:
+              path: api/dashboard/readiness/
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 3
+
+          livenessProbe:
+            httpGet:
+              path: "api/dashboard/liveness/"
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 3
+
+

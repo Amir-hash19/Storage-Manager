@@ -21,6 +21,16 @@ RUN pip install --upgrade pip && \
 
 COPY . .
 
+# Create non-root user
+RUN groupadd --gid 1000 django && \
+    useradd --uid 1000 --gid 1000 --create-home --shell /usr/sbin/nologin django && \
+    mkdir -p /usr/src/app/staticfiles && \
+    chown -R 1000:1000 /usr/src/app
+
+USER 1000:1000
+
 EXPOSE 8000
 
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4"]
+CMD ["sh", "-c", "python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4"]
+
+
