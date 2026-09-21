@@ -33,9 +33,7 @@ jobs:
       - name: Check Black
         run: |
           black --check .
-
-
-
+          
       - name: Django system checks
         env:
           DJANGO_SETTINGS_MODULE: config.settings
