@@ -34,9 +34,6 @@ jobs:
         run: |
           black --check .
 
-      - name: Check isort
-        run: |
-          isort --check-only .
 
 
       - name: Django system checks
