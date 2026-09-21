@@ -24,7 +24,7 @@ spec:
     requests.storage: "10Gi"
 
     persistentvolumeclaims: "5"
-    pods: "10"
+    pods: "15"
 
 ---
 apiVersion: v1

@@ -42,13 +42,6 @@ htmlcov/
 *.mo
 *.po
 local_settings.py
-**/migrations/*.py
-!**/migrations/__init__.py
-static/
-media/
-mediafiles/
-staticfiles/
-collectstatic/
 
 # Version Control
 .git/
@@ -57,7 +50,7 @@ collectstatic/
 .gitmodules
 .svn/
 .hg/
-CVS/
+CVS
 
 # Docker
 Dockerfile
@@ -110,7 +103,6 @@ temp/
 *.seed
 *.pid.lock
 npm-debug.log*
-yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
@@ -145,7 +137,6 @@ postgres_data/
 *.backup
 *.bak
 *.db-journal
-
 
 # OS
 .DS_Store
@@ -184,10 +175,14 @@ downloads/
 *.gz
 *.iso
 
-# Keep this files
+# Cache / generated static
+static/
+staticfiles/
+collectstatic/
+
+# Keep required files
 !requirements.txt
 !Dockerfile
 !.dockerignore
 !.env.example
 !manage.py
-!**/__init__.py

@@ -23,7 +23,7 @@ django-celery-results==2.6.0
 # Authentication
 # ==========================
 djangorestframework-simplejwt==5.5.1
-PyJWT==2.10.1
+
 
 # ==========================
 # Object Storage
@@ -46,7 +46,7 @@ python-decouple==3.8
 # Logging
 # ==========================
 structlog==25.4.0
-colorlog==6.9.0
+
 
 # ==========================
 # Monitoring
