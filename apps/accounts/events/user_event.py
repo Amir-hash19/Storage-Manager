@@ -1,6 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from uuid import UUID
-from dataclasses import asdict
 
 
 @dataclass(slots=True)
@@ -16,11 +15,8 @@ class UserLoggedInEvent:
     email: str
 
 
-
 @dataclass(slots=True)
 class UserChangedPasswordEvent:
     user_id: UUID
     email: str
     username: str
-    
-

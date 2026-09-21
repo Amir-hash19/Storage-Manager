@@ -1,10 +1,6 @@
 from apps.storage.repositories.folder_repository import FolderRepository
 
 
-
-
-
-
 class FolderHardDeleteService:
 
     @staticmethod
@@ -16,6 +12,4 @@ class FolderHardDeleteService:
 
         FolderRepository.hard_delete(folders)
 
-        return {
-            "deleted_count": count
-        }
+        return {"deleted_count": count}

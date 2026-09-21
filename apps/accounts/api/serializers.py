@@ -1,17 +1,12 @@
 from rest_framework import serializers
+
 from apps.accounts.models import UserAccount
+
 
 class UserResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserAccount
-        fields = (
-            "id",
-            "first_name",
-            "last_name",
-            "username",
-            "email",
-            "password"
-        )
+        fields = ("id", "first_name", "last_name", "username", "email", "password")
 
 
 class RegisterLoginResponseSerializer(serializers.Serializer):
@@ -20,11 +15,9 @@ class RegisterLoginResponseSerializer(serializers.Serializer):
     refresh = serializers.CharField(read_only=True)
 
 
-
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
-
 
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -35,10 +28,9 @@ class ChangePasswordSerializer(serializers.Serializer):
     def validate(self, attrs):
         if attrs["new_password"] != attrs["confirm_password"]:
             raise serializers.ValidationError(
-                {"confirm_password":"Password do not match."}
+                {"confirm_password": "Password do not match."}
             )
         return attrs
-
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -54,19 +46,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "avatar",
             "storage_quota",
             "used_storage",
-            "is_verified"
-
+            "is_verified",
         )
-
-
-
 
 
 class LogOutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
-
-
-
 
 
 class UserStorageSerializer(serializers.ModelSerializer):
@@ -84,7 +69,7 @@ class UserStorageSerializer(serializers.ModelSerializer):
         )
 
     def get_storage_quota_gb(self, obj):
-        return round(obj.storage_quota / (1024 ** 3), 2)
+        return round(obj.storage_quota / (1024**3), 2)
 
     def get_used_storage_mb(self, obj):
-        return round(obj.used_storage / (1024 ** 2), 2)
+        return round(obj.used_storage / (1024**2), 2)

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,10 +22,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY",default="django-insecure-#kqzh!dwm082k3sukm2*j)t6qtwv6wuay@h@g72%g=nyux%d6+")
+SECRET_KEY = config(
+    "SECRET_KEY",
+    default="django-insecure-#kqzh!dwm082k3sukm2*j)t6qtwv6wuay@h@g72%g=nyux%d6+",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DEBUG",default=True)
+DEBUG = config("DEBUG", default=True)
 
 ALLOWED_HOSTS = ["*"]
 
@@ -38,8 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    #third party packages
+    # third party packages
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
@@ -47,26 +50,19 @@ INSTALLED_APPS = [
     "django_filters",
     "drf_spectacular",
     "django_prometheus",
-
-    #apps
+    # apps
     "apps.accounts.apps.AccountsConfig",
     "apps.audit.apps.AuditConfig",
     "apps.storage.apps.StorageConfig",
     "apps.dashboard.apps.DashboardConfig",
-   
 ]
 
 AUTH_USER_MODEL = "accounts.UserAccount"
 
 MIDDLEWARE = [
-    
-    
     "apps.audit.middleware.AuditContextMiddleware",
-    
     "django.middleware.security.SecurityMiddleware",
-
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -158,16 +154,12 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-
-
 }
-
 
 
 from datetime import timedelta
@@ -175,19 +167,13 @@ from datetime import timedelta
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=120),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
-
 }
 
 
 CELERY_BROKER_URL = "redis://redis:6379/0"
 CELERY_RESULT_BACKEND = "redis://redis:6379/0"
-
-
-
-
 
 
 MINIO_ENDPOINT = config("MINIO_ENDPOINT")
@@ -197,25 +183,17 @@ MINIO_SECRET_KEY = config("MINIO_SECRET_KEY")
 
 MINIO_BUCKET_NAME = config("MINIO_BUCKET_NAME")
 
-MINIO_USE_SSL = config(
-    "MINIO_USE_SSL",
-    cast=bool,
-    default=False
-)
-
+MINIO_USE_SSL = config("MINIO_USE_SSL", cast=bool, default=False)
 
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Storage Manager API",
     "DESCRIPTION": "REST API documentation for Storage Manager.",
     "VERSION": "1.0.0",
-
     "SERVE_INCLUDE_SCHEMA": False,
-
     "SWAGGER_UI_SETTINGS": {
         "deepLinking": True,
         "persistAuthorization": True,
     },
-
     "COMPONENT_SPLIT_REQUEST": True,
 }

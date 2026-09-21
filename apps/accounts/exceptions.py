@@ -1,8 +1,5 @@
-
-
 class UserEmailAlreadyExists(Exception):
     pass
-
 
 
 class UserNameAlreadyExists(Exception):
@@ -30,20 +27,15 @@ class OldPasswordMatchNewPassword(Exception):
 
 
 class UserDoesNotExists(Exception):
-    pass    
-
+    pass
 
 
 class InvalidResetPasswordToken(Exception):
     pass
 
 
-
-
-
 class ResetPasswordTokenExpired(Exception):
     pass
-
 
 
 class ResetPasswordTokenAlreadyUsed(Exception):

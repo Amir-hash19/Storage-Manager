@@ -1,10 +1,8 @@
-from apps.accounts.models import UserAccount,UserRole
-from apps.storage.models import Folder, File, ShareLink, FileStatus
-from apps.audit.models import AuditLog
 from django.db.models import Count, Q, Sum
 
-
-
+from apps.accounts.models import UserAccount, UserRole
+from apps.audit.models import AuditLog
+from apps.storage.models import File, FileStatus, Folder, ShareLink
 
 
 class DashBoardRepository:
@@ -32,42 +30,29 @@ class DashBoardRepository:
             processing=Count("id", filter=Q(status=FileStatus.PROCESSING)),
             failed=Count("id", filter=Q(status=FileStatus.FAILED)),
             deleted=Count("id", filter=Q(status=FileStatus.DELETED)),
-    )
+        )
 
     @staticmethod
     def get_folders_statistics():
         Folder.objects.aggregate(
             total=Count("id"),
             deleted=Count("id", filter=Q(is_deleted=True)),
-    )
+        )
 
     @staticmethod
     def get_storage_summary():
         return UserAccount.objects.aggregate(
-            quote=Sum("storage_quota"),
-            used=Sum("used_storage"),
-            users=Count("id")
+            quote=Sum("storage_quota"), used=Sum("used_storage"), users=Count("id")
         )
 
     @staticmethod
     def get_top_storage_users(limit=10):
-        return (
-            UserAccount.objects
-            .order_by("-used_storage")
-            .values(
-                "id",
-                "username",
-                "used_storage",
-            )[:limit]
-        )
+        return UserAccount.objects.order_by("-used_storage").values(
+            "id",
+            "username",
+            "used_storage",
+        )[:limit]
 
     @staticmethod
     def get_logs():
-        return (
-            AuditLog.objects.select_related(
-                "user"
-            )
-            .all()
-        )
-    
-
+        return AuditLog.objects.select_related("user").all()

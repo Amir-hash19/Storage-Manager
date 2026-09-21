@@ -1,23 +1,23 @@
-#from django.contrib.auth.password_validation import validate_password
-#from django.utils import timezone
+# from django.contrib.auth.password_validation import validate_password
+# from django.utils import timezone
 #
-#from apps.accounts.exceptions import (
+# from apps.accounts.exceptions import (
 #    InvalidResetPasswordToken,
 #    ResetPasswordTokenExpired,
 #    ResetPasswordTokenAlreadyUsed,
 #    PasswordsNotMatch,
-#)
+# )
 #
-#from apps.accounts.repositories.user_repository import PasswordResetRepository
-#from apps.accounts.repositories.user_repository import (
+# from apps.accounts.repositories.user_repository import PasswordResetRepository
+# from apps.accounts.repositories.user_repository import (
 #    UserRepository,
-#)
+# )
 #
-#from apps.accounts.events.user_event import UserChangedPasswordEvent
-#from core.events import EventBus
+# from apps.accounts.events.user_event import UserChangedPasswordEvent
+# from core.events import EventBus
 #
 #
-#class ResetPasswordService:
+# class ResetPasswordService:
 #
 #    @staticmethod
 #    def is_expired(reset_token):

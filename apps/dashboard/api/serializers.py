@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from apps.audit.models import AuditLog
 
 
@@ -8,8 +9,6 @@ class DashboardUsersStatisticsSerializer(serializers.Serializer):
     inactive_users = serializers.IntegerField()
     verified_users = serializers.IntegerField()
     unverified_users = serializers.IntegerField()
-
-
 
 
 class TopStorageUserSerializer(serializers.Serializer):
@@ -25,9 +24,6 @@ class DashboardStorageSerializer(serializers.Serializer):
     usage_percent = serializers.FloatField()
     average_usage_per_user = serializers.IntegerField()
     top_users = TopStorageUserSerializer(many=True)
-
-
-
 
 
 class AuditSerializer(serializers.ModelSerializer):

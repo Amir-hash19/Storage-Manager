@@ -1,10 +1,7 @@
 from django.db import transaction
 
-
-from apps.storage.repositories.folder_repository import FolderRepository
 from apps.storage.exceptions import FolderNotFound
-
-
+from apps.storage.repositories.folder_repository import FolderRepository
 
 
 class FolderDeleteService:
@@ -13,9 +10,7 @@ class FolderDeleteService:
     @transaction.atomic
     def delete(folder_id, user):
 
-        folder = FolderRepository.get_by_id(
-            folder_id=folder_id
-        )
+        folder = FolderRepository.get_by_id(folder_id=folder_id)
 
         if folder is None:
             raise FolderNotFound()

@@ -1,20 +1,15 @@
-from apps.storage.exceptions import FolderNotFound, FolderAlreadyExists
-from apps.storage.repositories.folder_repository import FolderRepository
 from django.db import transaction
+
+from apps.storage.exceptions import FolderAlreadyExists, FolderNotFound
+from apps.storage.repositories.folder_repository import FolderRepository
 
 
 class RenameFolderService:
 
     @staticmethod
     @transaction.atomic
-    def execute(
-        *,
-        folder_id,
-        owner,
-        new_name
-    ):
+    def execute(*, folder_id, owner, new_name):
         folder = FolderRepository.get_by_id(folder_id)
-
 
         if not folder:
             raise FolderNotFound()
@@ -28,9 +23,7 @@ class RenameFolderService:
             return folder
 
         exists = FolderRepository.exists_by_name(
-            owner=owner,
-            parent=folder.parent,
-            name=new_name
+            owner=owner, parent=folder.parent, name=new_name
         )
 
         if exists:
@@ -44,10 +37,9 @@ class RenameFolderService:
             folder.path = f"{folder.parent.path}{new_name}/"
 
         else:
-            folder.path = f"{new_name}/"    
+            folder.path = f"{new_name}/"
 
         FolderRepository.save(folder)
-
 
         descendants = FolderRepository.get_descendants(folder)
 
@@ -60,4 +52,4 @@ class RenameFolderService:
         if descendants:
             FolderRepository.bulk_update_paths(descendants)
 
-        return folder    
+        return folder

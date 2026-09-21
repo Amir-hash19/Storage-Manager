@@ -8,26 +8,15 @@ class ShareLinkService:
     def __init__(self, repository=None):
         self.repository = repository or ShareLinkRepository()
 
-
     def create_share_link(
-            self,
-            *,
-            file,
-            user,
-            password="",
-            expires_at=None,
-            max_downloads=0
+        self, *, file, user, password="", expires_at=None, max_downloads=0
     ):
         if file.owner_id != user.id:
-            raise PermissionError(
-                "You do not have permission to share this file."
-            )
-            
+            raise PermissionError("You do not have permission to share this file.")
+
         if max_downloads < 0:
-            raise ValueError(
-                "max downloads cannot be negative."
-            )    
-        
+            raise ValueError("max downloads cannot be negative.")
+
         hashed_password = ""
 
         if password:
@@ -39,4 +28,4 @@ class ShareLinkService:
             password=hashed_password,
             expires_at=expires_at,
             max_downloads=max_downloads,
-        )    
+        )

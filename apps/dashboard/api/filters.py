@@ -1,7 +1,6 @@
 import django_filters
+
 from apps.audit.models import AuditLog
-
-
 
 
 class AuditLogFilter(django_filters.FilterSet):

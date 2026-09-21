@@ -1,10 +1,6 @@
 from contextvars import ContextVar
 
-
-
-
 _audit_context = ContextVar("audit_context", default={})
-
 
 
 class AuditContext:

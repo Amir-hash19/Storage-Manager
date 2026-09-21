@@ -1,25 +1,26 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from drf_spectacular.utils import (OpenApiExample, OpenApiResponse,
+                                   extend_schema)
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import UserStorageSerializer, LogOutSerializer, UserProfileSerializer,ChangePasswordSerializer,RegisterLoginResponseSerializer, UserResponseSerializer,LoginSerializer
-from apps.accounts.services.retrive_user_storage import RetrieveUserStorageService
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from apps.accounts.exceptions import (InactiveUser, InvalidCredentials,
+                                      UserEmailAlreadyExists,
+                                      UserNameAlreadyExists)
+from apps.accounts.services.change_password import ChangePasswordService
 from apps.accounts.services.create_user_service import RegisterUserService
 from apps.accounts.services.login import LoginUserService
-from apps.accounts.services.profile import UserProfileService
-from apps.accounts.services.change_password import ChangePasswordService
 from apps.accounts.services.logout import AuthService
-from apps.accounts.exceptions import UserEmailAlreadyExists, UserNameAlreadyExists, InvalidCredentials, InactiveUser
+from apps.accounts.services.profile import UserProfileService
+from apps.accounts.services.retrive_user_storage import \
+    RetrieveUserStorageService
 
+from .serializers import (ChangePasswordSerializer, LoginSerializer,
+                          LogOutSerializer, RegisterLoginResponseSerializer,
+                          UserProfileSerializer, UserResponseSerializer,
+                          UserStorageSerializer)
 
-from drf_spectacular.utils import (
-    extend_schema,
-    OpenApiExample,
-    OpenApiResponse,
-)
-
-from drf_spectacular.utils import extend_schema
-    
 
 class RegisterView(APIView):
 
@@ -36,42 +37,33 @@ class RegisterView(APIView):
     The frontend does not need to store tokens manually.
     They will be sent automatically with subsequent requests.    
         """,
-    request=UserResponseSerializer,
-    responses={
-            201: RegisterLoginResponseSerializer
-        }
+        request=UserResponseSerializer,
+        responses={201: RegisterLoginResponseSerializer},
     )
-    
     def post(self, request):
         serializer = UserResponseSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         try:
-            result = RegisterUserService().execute(
-                serializer.validated_data
-            )
+            result = RegisterUserService().execute(serializer.validated_data)
         except UserEmailAlreadyExists:
             return Response(
-                {"detail": "Email already exists."},
-                status=status.HTTP_400_BAD_REQUEST
-            )    
+                {"detail": "Email already exists."}, status=status.HTTP_400_BAD_REQUEST
+            )
         except UserNameAlreadyExists:
             return Response(
-                {"detail":"UserName Already exists."},
-                status=status.HTTP_400_BAD_REQUEST
+                {"detail": "UserName Already exists."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         return Response(
             RegisterLoginResponseSerializer(result).data,
             status=status.HTTP_201_CREATED,
         )
-    
-
 
 
 class LoginView(APIView):
 
-    
     @extend_schema(
         summary="User Login",
         description="""
@@ -87,50 +79,40 @@ class LoginView(APIView):
         request=LoginSerializer,
         responses={
             200: RegisterLoginResponseSerializer,
-            401: OpenApiResponse(
-                description="Invalid email or password."
-            ),
-            403: OpenApiResponse(
-                description="User account is inactive."
-            ),
+            401: OpenApiResponse(description="Invalid email or password."),
+            403: OpenApiResponse(description="User account is inactive."),
         },
         examples=[
             OpenApiExample(
                 "Request",
-                value={
-                    "email": "john@example.com",
-                    "password": "StrongPassword123"
-                },
+                value={"email": "john@example.com", "password": "StrongPassword123"},
                 request_only=True,
             )
-        ]
+        ],
     )
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         try:
-            result = LoginUserService().execute(
-                serializer.validated_data
-            )
+            result = LoginUserService().execute(serializer.validated_data)
 
         except InvalidCredentials:
             return Response(
                 {"detail": "Invalid email or password."},
-                status=status.HTTP_401_UNAUTHORIZED
-            )   
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
         except InactiveUser:
             return Response(
-                {"detail":"User Account is inactive."},
-                status=status.HTTP_403_FORBIDDEN
+                {"detail": "User Account is inactive."},
+                status=status.HTTP_403_FORBIDDEN,
             )
-        
+
         return Response(
-            RegisterLoginResponseSerializer(result).data,
-            status=status.HTTP_200_OK
+            RegisterLoginResponseSerializer(result).data, status=status.HTTP_200_OK
         )
-    
+
 
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
@@ -138,15 +120,10 @@ class ChangePasswordView(APIView):
     @extend_schema(
         request=ChangePasswordSerializer,
         responses={
-            200: OpenApiResponse(
-                description="Password changed successfully."
-            ),
-            401: OpenApiResponse(
-                description="Unauthorized."
-            ),
-            403: OpenApiResponse(
-                description="User account is inactive."
-            ),},
+            200: OpenApiResponse(description="Password changed successfully."),
+            401: OpenApiResponse(description="Unauthorized."),
+            403: OpenApiResponse(description="User account is inactive."),
+        },
         summary="Change Password",
         description="""
     Authenticated users can access this endpoint.
@@ -157,20 +134,16 @@ class ChangePasswordView(APIView):
         status code 200,
         "message":"Password Changed Successfully."
         
-        """
+        """,
     )
     def post(self, request):
         serializer = ChangePasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        ChangePasswordService.execute(
-            user=request.user,
-            **serializer.validated_data
-        )
+        ChangePasswordService.execute(user=request.user, **serializer.validated_data)
 
         return Response(
-            {"message":"Password Changed Successfully."},
-            status=status.HTTP_200_OK
+            {"message": "Password Changed Successfully."}, status=status.HTTP_200_OK
         )
 
 
@@ -186,7 +159,7 @@ class RetrieveUserView(APIView):
     retrun:
         user data,
         status code 200    
-        """
+        """,
     )
     def get(self, request):
         user = UserProfileService().get_user_profile(request.user)
@@ -195,36 +168,22 @@ class RetrieveUserView(APIView):
         return Response(serializer.data, status=200)
 
 
-
-
-
-
 class LogOutView(APIView):
     permission_classes = [IsAuthenticated]
 
-
     @extend_schema(
-        request=LogOutSerializer,
-        summary="logout",
-        description="client can log out ."
-
+        request=LogOutSerializer, summary="logout", description="client can log out ."
     )
     def post(self, request):
         serializer = LogOutSerializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
 
-        AuthService().logout(
-            serializer.validated_data["refresh"]
-        )
-        
+        AuthService().logout(serializer.validated_data["refresh"])
 
         return Response(
-            {"detail": "User LogOut Successfully."},
-            status=status.HTTP_204_NO_CONTENT
+            {"detail": "User LogOut Successfully."}, status=status.HTTP_204_NO_CONTENT
         )
-
-
 
 
 class RetvieveUserStorageView(APIView):
@@ -234,13 +193,10 @@ class RetvieveUserStorageView(APIView):
     @extend_schema(
         request=UserStorageSerializer,
         summary="Get user storage usage",
-        description="return users storage usage"
-
+        description="return users storage usage",
     )
     def get(self, request):
-        storage = RetrieveUserStorageService.execute(
-                request.user.id
-        )
+        storage = RetrieveUserStorageService.execute(request.user.id)
 
         serializer = self.serializer_class(storage)
 

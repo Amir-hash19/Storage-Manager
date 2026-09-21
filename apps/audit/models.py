@@ -1,41 +1,26 @@
 import uuid
+
 from django.db import models
+
 from core.models.base import BaseModel
 
-
-from .constants import (
-    AuditAction,
-    AuditResource,
-    AuditStatus
-)
-
-
+from .constants import AuditAction, AuditResource, AuditStatus
 
 
 class AuditLog(BaseModel):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     user = models.ForeignKey(
         "accounts.UserAccount",
         on_delete=models.SET_NULL,
         related_name="audit_logs",
         null=True,
-        blank=True
+        blank=True,
     )
 
-    action = models.CharField(
-        max_length=50,
-        choices=AuditAction.choices
-    )
+    action = models.CharField(max_length=50, choices=AuditAction.choices)
 
-    resource = models.CharField(
-        max_length=30,
-        choices=AuditResource.choices
-    )
+    resource = models.CharField(max_length=30, choices=AuditResource.choices)
 
     resource_id = models.UUIDField(
         null=True,
@@ -52,14 +37,9 @@ class AuditLog(BaseModel):
         blank=True,
     )
 
-    user_agent = models.TextField(
-        blank=True
-    )
+    user_agent = models.TextField(blank=True)
 
-    request_id = models.UUIDField(
-        null=True,
-        blank=True
-    )
+    request_id = models.UUIDField(null=True, blank=True)
 
     metadata = models.JSONField(
         default=dict,
@@ -85,6 +65,5 @@ class AuditLog(BaseModel):
             models.Index(fields=["request_id"]),
         ]
 
-        
     def __str__(self):
-        return f"{self.action} - {self.user}"    
+        return f"{self.action} - {self.user}"

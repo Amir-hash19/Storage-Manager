@@ -1,30 +1,24 @@
-from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework import status
-from .filters import AuditLogFilter
-from core.paginations import DefaultPagination
 from django.db import connection
 from django.http import JsonResponse
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import (OpenApiExample, OpenApiResponse,
+                                   extend_schema)
+from rest_framework import status
+from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from apps.dashboard.api.serializers import (AuditSerializer,
+                                            DashboardStorageSerializer,
+                                            DashboardUsersStatisticsSerializer)
 from apps.dashboard.services.dashboard_service import (
-    DashBoardUserStatisticsService,DashBoardStorageService, DashBoardAuditService
-)
-from apps.dashboard.api.serializers import (
-    DashboardUsersStatisticsSerializer,DashboardStorageSerializer, AuditSerializer
-)
+    DashBoardAuditService, DashBoardStorageService,
+    DashBoardUserStatisticsService)
+from core.paginations import DefaultPagination
 
-from drf_spectacular.utils import (
-    extend_schema,
-    OpenApiExample,
-    OpenApiResponse,
-)
-
-from drf_spectacular.utils import extend_schema
-
+from .filters import AuditLogFilter
 
 
 class DashboardUsersView(APIView):
@@ -32,14 +26,11 @@ class DashboardUsersView(APIView):
     permission_classes = [IsAdminUser]
 
     @extend_schema(
-            summary="users statistics.",
-            description="admin user can see the user statistic like storage usage emaning storage and more...",
-            request=DashboardUsersStatisticsSerializer,
-            responses={
-                202: DashboardUsersStatisticsSerializer
-            }
+        summary="users statistics.",
+        description="admin user can see the user statistic like storage usage emaning storage and more...",
+        request=DashboardUsersStatisticsSerializer,
+        responses={202: DashboardUsersStatisticsSerializer},
     )
-
     def get(self, request):
         data = DashBoardUserStatisticsService.execute()
 
@@ -48,19 +39,14 @@ class DashboardUsersView(APIView):
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
-
-
 class DashboardStorageView(APIView):
     permission_classes = [IsAdminUser]
 
-
     @extend_schema(
-            summary="Storage Statistics",
-            description="admin user can check the storage statistics.",
-            request=DashboardStorageSerializer,
-            responses={
-                200: DashboardStorageSerializer
-            }
+        summary="Storage Statistics",
+        description="admin user can check the storage statistics.",
+        request=DashboardStorageSerializer,
+        responses={200: DashboardStorageSerializer},
     )
     def get(self, request):
         data = DashBoardStorageService.execute()
@@ -68,8 +54,6 @@ class DashboardStorageView(APIView):
         serializer = DashboardStorageSerializer(data)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-
 
 
 class DashboardAuditView(ListAPIView):
@@ -95,32 +79,22 @@ class DashboardAuditView(ListAPIView):
         "ip_address",
     )
 
-    ordering_fields = (
-        "created_at",
-    )
+    ordering_fields = ("created_at",)
 
-    ordering = (
-        "-created_at",
-    )
+    ordering = ("-created_at",)
 
     def get_queryset(self):
         return DashBoardAuditService.execute()
-    
 
 
+# liveness Prob
 
-
-
-
-#liveness Prob
 
 def liveness(request):
     return JsonResponse({"status": "OK"})
 
 
-
-
-#readiness Prob
+# readiness Prob
 def readiness(request):
     try:
         with connection.cursor() as cursor:

@@ -1,4 +1,5 @@
-from apps.dashboard.repositories.dashboard_repository import DashBoardRepository
+from apps.dashboard.repositories.dashboard_repository import \
+    DashBoardRepository
 
 
 class DashBoardUserStatisticsService:
@@ -16,9 +17,6 @@ class DashBoardUserStatisticsService:
         }
 
 
-
-
-
 class DashBoardStorageService:
 
     @classmethod
@@ -34,20 +32,18 @@ class DashBoardStorageService:
             "total_quota": total_quota,
             "used_storage": used_storage,
             "free_storage": total_quota - used_storage,
-            "usage_percent": round(
-                (used_storage / total_quota) * 100, 2
-            ) if total_quota else 0,
+            "usage_percent": (
+                round((used_storage / total_quota) * 100, 2) if total_quota else 0
+            ),
             "average_usage_per_user": (
-                used_storage // total_users
-                if total_users else 0
+                used_storage // total_users if total_users else 0
             ),
             "top_users": list(top_users),
-        }    
-
+        }
 
 
 class DashBoardAuditService:
 
     @classmethod
     def execute(cls):
-        return  DashBoardRepository.get_logs()   
+        return DashBoardRepository.get_logs()

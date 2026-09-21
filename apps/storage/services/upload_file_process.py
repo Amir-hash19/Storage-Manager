@@ -1,4 +1,5 @@
 from django.db import transaction
+
 from apps.accounts.repositories.user_repository import UserRepository
 from apps.storage.events.storage_event import FileUploadedEvent
 from apps.storage.exceptions import FileNotFound
@@ -6,8 +7,6 @@ from apps.storage.models import FileStatus
 from apps.storage.repositories.file_repository import FileRepository
 from apps.storage.services.minIO.storage_service import MinioStorageService
 from apps.storage.services.temp_file_service import TempFileService
-
-
 
 
 class ProcessUploadService:
@@ -36,8 +35,6 @@ class ProcessUploadService:
                     file_size=file.size,
                     content_type=file.mime_type,
                 )
-
-            
 
             with transaction.atomic():
 

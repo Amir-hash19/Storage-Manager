@@ -1,11 +1,15 @@
 from datetime import timedelta
+
 from django.conf import settings
 from minio import Minio
 from minio.commonconfig import CopySource
 from minio.error import S3Error
 
-from apps.storage.exceptions import( StorageException, StorageUploadException,
-StorageDeleteException, StorageDownloadException, StorageObjectNotFound )
+from apps.storage.exceptions import (StorageDeleteException,
+                                     StorageDownloadException,
+                                     StorageException, StorageObjectNotFound,
+                                     StorageUploadException)
+
 
 class MinioStorageService:
 
@@ -140,4 +144,3 @@ class MinioStorageService:
             object_name=storage_key,
             expires=expires,
         )
-

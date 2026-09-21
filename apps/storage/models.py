@@ -1,13 +1,12 @@
-from django.db import models
-from core.models.base import BaseModel
 import uuid
 
+from django.db import models
+
+from core.models.base import BaseModel
+
+
 class Folder(BaseModel):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     owner = models.ForeignKey(
         "accounts.UserAccount",
@@ -32,10 +31,7 @@ class Folder(BaseModel):
 
     is_deleted = models.BooleanField(default=False)
 
-    deleted_at = models.DateTimeField(
-        null=True,
-        blank=True
-    )
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = "folders"
@@ -59,13 +55,11 @@ class Folder(BaseModel):
         return self.name
 
 
-
 class FileStatus(models.TextChoices):
     ACTIVE = "ACTIVE", "Active"
     DELETED = "DELETED", "Deleted"
     PROCESSING = "PROCESSING", "Processing"
     FAILED = "FAILED", "Failed"
-
 
 
 class File(BaseModel):
@@ -104,12 +98,10 @@ class File(BaseModel):
     )
 
     status = models.CharField(
-    max_length=20,
-    choices=FileStatus.choices,
-    default=FileStatus.ACTIVE,
+        max_length=20,
+        choices=FileStatus.choices,
+        default=FileStatus.ACTIVE,
     )
-
-    
 
     class Meta:
         db_table = "files"
@@ -132,10 +124,6 @@ class File(BaseModel):
 
     def __str__(self):
         return self.file_name
-
-
-
-
 
 
 class ShareLink(BaseModel):
@@ -178,7 +166,6 @@ class ShareLink(BaseModel):
     is_active = models.BooleanField(
         default=True,
     )
-   
 
     class Meta:
         db_table = "share_links"

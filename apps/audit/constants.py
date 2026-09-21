@@ -16,8 +16,6 @@ class AuditAction(models.TextChoices):
     SHARE_CREATE = "SHARE_CREATE", "Share Create"
     SHARE_DELETE = "SHARE_DELETE", "Share Delete"
 
-    
-
 
 class AuditResource(models.TextChoices):
     USER = "USER", "User"

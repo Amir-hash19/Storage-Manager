@@ -6,18 +6,12 @@ class TempFileService:
 
     BASE_PATH = "/tmp/storage"
 
-
     @staticmethod
     def save(uploaded_file):
 
-        os.makedirs(
-            TempFileService.BASE_PATH,
-            exist_ok=True
-        )
+        os.makedirs(TempFileService.BASE_PATH, exist_ok=True)
 
-        suffix = os.path.splitext(
-            uploaded_file.name
-        )[1]
+        suffix = os.path.splitext(uploaded_file.name)[1]
 
         fd, path = tempfile.mkstemp(
             suffix=suffix,
@@ -31,11 +25,9 @@ class TempFileService:
 
         return path
 
-
     @staticmethod
     def open(path):
         return open(path, "rb")
-
 
     @staticmethod
     def delete(path):
