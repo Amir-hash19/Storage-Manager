@@ -5,10 +5,13 @@ from minio import Minio
 from minio.commonconfig import CopySource
 from minio.error import S3Error
 
-from apps.storage.exceptions import (StorageDeleteException,
-                                     StorageDownloadException,
-                                     StorageException, StorageObjectNotFound,
-                                     StorageUploadException)
+from apps.storage.exceptions import (
+    StorageDeleteException,
+    StorageDownloadException,
+    StorageException,
+    StorageObjectNotFound,
+    StorageUploadException,
+)
 
 
 class MinioStorageService:

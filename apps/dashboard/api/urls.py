@@ -1,7 +1,12 @@
 from django.urls import path
 
-from .views import (DashboardAuditView, DashboardStorageView,
-                    DashboardUsersView, liveness, readiness)
+from .views import (
+    DashboardAuditView,
+    DashboardStorageView,
+    DashboardUsersView,
+    liveness,
+    readiness,
+)
 
 urlpatterns = [
     path("user-statics/", DashboardUsersView.as_view(), name="user-statics"),

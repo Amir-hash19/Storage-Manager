@@ -2,13 +2,17 @@ from dataclasses import asdict
 
 from django.db import transaction
 
-from apps.accounts.events.user_event import (UserChangedPasswordEvent,
-                                             UserLoggedInEvent,
-                                             UserRegisteredEvent)
+from apps.accounts.events.user_event import (
+    UserChangedPasswordEvent,
+    UserLoggedInEvent,
+    UserRegisteredEvent,
+)
 from apps.accounts.tasks.user_tasks import process_audit_event
 from apps.audit.context import AuditContext
-from apps.storage.events.storage_event import (FileUploadedEvent,
-                                               FileUploadRequestedEvent)
+from apps.storage.events.storage_event import (
+    FileUploadedEvent,
+    FileUploadRequestedEvent,
+)
 from apps.storage.tasks.process_storage_event import process_storage_event
 
 

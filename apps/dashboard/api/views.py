@@ -1,8 +1,7 @@
 from django.db import connection
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import (OpenApiExample, OpenApiResponse,
-                                   extend_schema)
+from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import ListAPIView
@@ -10,12 +9,16 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.dashboard.api.serializers import (AuditSerializer,
-                                            DashboardStorageSerializer,
-                                            DashboardUsersStatisticsSerializer)
+from apps.dashboard.api.serializers import (
+    AuditSerializer,
+    DashboardStorageSerializer,
+    DashboardUsersStatisticsSerializer,
+)
 from apps.dashboard.services.dashboard_service import (
-    DashBoardAuditService, DashBoardStorageService,
-    DashBoardUserStatisticsService)
+    DashBoardAuditService,
+    DashBoardStorageService,
+    DashBoardUserStatisticsService,
+)
 from core.paginations import DefaultPagination
 
 from .filters import AuditLogFilter

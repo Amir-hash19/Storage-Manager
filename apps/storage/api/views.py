@@ -1,7 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import (OpenApiExample, OpenApiResponse,
-                                   extend_schema)
+from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework import mixins, status, viewsets
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated
@@ -13,27 +12,31 @@ from apps.storage.models import File
 from apps.storage.services.download_file import DownloadFileService
 from apps.storage.services.file_service import FileService
 from apps.storage.services.folder_service import FolderContentService
-from apps.storage.services.folder_services.create_folder import \
-    FolderCreateService
-from apps.storage.services.folder_services.delete_folder import \
-    FolderDeleteService
-from apps.storage.services.folder_services.empty_trash_folder import \
-    FolderHardDeleteService
-from apps.storage.services.folder_services.list_trash_folder import \
-    ListFolderTrashService
-from apps.storage.services.folder_services.rename_folder import \
-    RenameFolderService
-from apps.storage.services.folder_services.restore_folder import \
-    FolderRestoreService
+from apps.storage.services.folder_services.create_folder import FolderCreateService
+from apps.storage.services.folder_services.delete_folder import FolderDeleteService
+from apps.storage.services.folder_services.empty_trash_folder import (
+    FolderHardDeleteService,
+)
+from apps.storage.services.folder_services.list_trash_folder import (
+    ListFolderTrashService,
+)
+from apps.storage.services.folder_services.rename_folder import RenameFolderService
+from apps.storage.services.folder_services.restore_folder import FolderRestoreService
 from apps.storage.services.sharelink.share_link_service import ShareLinkService
 from apps.storage.services.upload_file import UploadFileService
 
 from .filters import FileFilter
-from .serializers import (CreateFolderSerialzer, FileDetailSerializer,
-                          FileListSerializer, FileUploadSerializer,
-                          FolderContentsSerializer, FolderListSerializer,
-                          FolderSerializer, RenameFolderSerializer,
-                          ShareLinkCreateSerializer)
+from .serializers import (
+    CreateFolderSerialzer,
+    FileDetailSerializer,
+    FileListSerializer,
+    FileUploadSerializer,
+    FolderContentsSerializer,
+    FolderListSerializer,
+    FolderSerializer,
+    RenameFolderSerializer,
+    ShareLinkCreateSerializer,
+)
 
 
 class CreateFolderView(APIView):

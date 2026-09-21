@@ -1,25 +1,31 @@
-from drf_spectacular.utils import (OpenApiExample, OpenApiResponse,
-                                   extend_schema)
+from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.exceptions import (InactiveUser, InvalidCredentials,
-                                      UserEmailAlreadyExists,
-                                      UserNameAlreadyExists)
+from apps.accounts.exceptions import (
+    InactiveUser,
+    InvalidCredentials,
+    UserEmailAlreadyExists,
+    UserNameAlreadyExists,
+)
 from apps.accounts.services.change_password import ChangePasswordService
 from apps.accounts.services.create_user_service import RegisterUserService
 from apps.accounts.services.login import LoginUserService
 from apps.accounts.services.logout import AuthService
 from apps.accounts.services.profile import UserProfileService
-from apps.accounts.services.retrive_user_storage import \
-    RetrieveUserStorageService
+from apps.accounts.services.retrive_user_storage import RetrieveUserStorageService
 
-from .serializers import (ChangePasswordSerializer, LoginSerializer,
-                          LogOutSerializer, RegisterLoginResponseSerializer,
-                          UserProfileSerializer, UserResponseSerializer,
-                          UserStorageSerializer)
+from .serializers import (
+    ChangePasswordSerializer,
+    LoginSerializer,
+    LogOutSerializer,
+    RegisterLoginResponseSerializer,
+    UserProfileSerializer,
+    UserResponseSerializer,
+    UserStorageSerializer,
+)
 
 
 class RegisterView(APIView):

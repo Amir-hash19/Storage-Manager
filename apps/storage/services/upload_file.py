@@ -5,8 +5,11 @@ from pathlib import Path
 from django.db import transaction
 
 from apps.storage.events.storage_event import FileUploadRequestedEvent
-from apps.storage.exceptions import (FileAlreadyExists, FolderNotFound,
-                                     StorageQuotaExceeded)
+from apps.storage.exceptions import (
+    FileAlreadyExists,
+    FolderNotFound,
+    StorageQuotaExceeded,
+)
 from apps.storage.models import FileStatus
 from apps.storage.repositories.file_repository import FileRepository
 from apps.storage.repositories.folder_repository import FolderRepository

@@ -1,5 +1,4 @@
-from apps.dashboard.repositories.dashboard_repository import \
-    DashBoardRepository
+from apps.dashboard.repositories.dashboard_repository import DashBoardRepository
 
 
 class DashBoardUserStatisticsService:

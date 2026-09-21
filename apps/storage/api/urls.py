@@ -1,11 +1,22 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import (CreateFolderView, DownloadfileView, EmptyTrashView,
-                    FileDeleteView, FileRestoreView, FileUploadView,
-                    FileViewSet, FolderContentsView, FolderDeleteView,
-                    FolderListView, FolderRestoreView, RenameFolderView,
-                    ShareLinkCreateAPIView, TrashFolderListView)
+from .views import (
+    CreateFolderView,
+    DownloadfileView,
+    EmptyTrashView,
+    FileDeleteView,
+    FileRestoreView,
+    FileUploadView,
+    FileViewSet,
+    FolderContentsView,
+    FolderDeleteView,
+    FolderListView,
+    FolderRestoreView,
+    RenameFolderView,
+    ShareLinkCreateAPIView,
+    TrashFolderListView,
+)
 
 router = DefaultRouter()
 

@@ -2,9 +2,12 @@ from django.db import transaction
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.events.user_event import UserLoggedInEvent
-from apps.accounts.exceptions import (InactiveUser, InvalidCredentials,
-                                      UserEmailAlreadyExists,
-                                      UserNameAlreadyExists)
+from apps.accounts.exceptions import (
+    InactiveUser,
+    InvalidCredentials,
+    UserEmailAlreadyExists,
+    UserNameAlreadyExists,
+)
 from apps.accounts.repositories.user_repository import UserRepository
 from core.events import EventBus
 
