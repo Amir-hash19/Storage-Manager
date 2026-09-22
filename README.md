@@ -1,61 +1,521 @@
-# Storage manager Google Driver Clone
+# راهنمای جامع پروژه Storage Manager
+<div align="center">
 
-A scalable and maintainable backend API built with **Django**, **Django REST Framework**, and **JWT Authentication**, following **Clean Architecture**, **Service Layer**, **Repository Pattern**, and an **Event-Driven Architecture**.
+# DevOps Section 👨‍💻
 
-One of the core modules is a **Google Drive-inspired Storage Manager**, providing hierarchical folder management, file organization, uploads, downloads, moving, renaming, and deletion through a RESTful API.
+</div>
+<div align="center">
 
-The project is fully containerized with **Docker Compose** and designed for scalability, maintainability, and clean separation of concerns.
+![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)
+![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/postgresql-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
+![MinIO](https://img.shields.io/badge/MinIO-C7202C?style=for-the-badge&logo=minio&logoColor=white)
+![ArgoCD](https://img.shields.io/badge/Argo%20CD-1F4E79?style=for-the-badge&logo=argo&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
+
+</div>
 
 ---
 
-# Features
+## 📌 فهرست مطالب
+
+
+- [معماری سیستم](#-معماری-سیستم)
+- [ساختار پوشه‌ها](#-ساختار-پوشهها)
+- [راه‌اندازی پروژه](#-راهاندازی-پروژه)
+- [توضیح فایل‌های Kubernetes](#-توضیح-فایلهای-kubernetes)
+- [مانیتورینگ](#-مانیتورینگ)
+- [دستورات پرکاربرد](#-دستورات-پرکاربرد)
+
+
+---
+
+## 🎯 معرفی پروژه
+
+پروژه مدیریت ذخیره سازی فایل که با جنگو و postgres و minio پیاده شده و توسعه داده شده  , برای devops از kubernetes استفاده شده و باقی موارد .....
+
+### ویژگی‌های کلیدی
+
+
+- ✅ مقیاس‌پذیری خودکار (HPA)
+- ✅ ذخیره سازی با minIO 
+- ✅ صف‌بندی وظایف با Celery + Redis
+- ✅ دیتابیس PostgreSQL با StatefulSet
+- ✅ خودکار سازی با CI با github action
+- ✅ برای gitops از ArgoCD استفاده شده
+
+---
+
+## 🏗 معماری سیستم
+
+<p align="center">
+  <img src="docs/workflow.png" alt="System Architecture" width="900">
+</p>
+
+
+### کامپوننت‌های اصلی
+
+| کامپوننت | نوع Resource | کاربرد |
+|----------|--------------|--------|
+| **Django Web** | Deployment + HPA | سرویس اصلی اپلیکیشن |
+| **PostgreSQL** | StatefulSet | دیتابیس اصلی |
+| **Redis** | Deployment | Broker و Cache |
+| **MinIO** | Deployment | Object Storage |
+| **Celery Worker** | Deployment | پردازش وظایف Async |
+| **Celery Beat** | Deployment | زمان‌بندی وظایف |
+| **Ingress Nginx** | Ingress | ورودی ترافیک |
+
+---
+
+## 📁 ساختار پوشه‌ها
+
+```
+storage-manager/
+├── apps/                       # اپلیکیشن‌های Django
+├── config/                     # تنظیمات اصلی پروژه (settings)
+├── core/                       # ماژول‌های پایه و مشترک
+├── docs/                       # مستندات پروژه
+├── nginx/                      # کانفیگ Nginx
+├── static/                     # فایل‌های استاتیک سورس
+├── staticfiles/                # فایل‌های استاتیک جمع‌آوری شده
+├── media/                      # فایل‌های آپلود شده
+├── venv/                       # محیط مجازی پایتون
+│
+├── kubernetes/                 # 📦 K8S manifests
+│   ├── namespace.yaml
+│   ├── storage-manager-ingress.yaml
+│   ├── celery-beat.yaml
+│   │
+│   ├── web/                    # Django Web
+│   │   ├── configmap.yaml
+│   │   ├── secret.yaml
+│   │   ├── deployment.yaml
+│   │   ├── service.yaml
+│   │   └── hpa-django.yaml
+│   │
+│   ├── postgres/               # دیتابیس
+│   │   ├── pvc.yaml
+│   │   ├── secret.yaml
+│   │   ├── service.yaml
+│   │   └── statefulset.yaml
+│   │
+│   ├── redis/                  # Cache & Broker
+│   │   ├── depolyment.yaml
+│   │   └── service.yaml
+│   │
+│   ├── minio/                  # Object Storage
+│   │   ├── deployment.yaml
+│   │   ├── pvc.yaml
+│   │   ├── secret.yaml
+│   │   └── service.yaml
+│   │
+│   └── celery/                 # Celery Worker
+│       └── deployment.yaml
+│
+├── .github/
+│   └── workflows/              # 🔄 CI/CD Pipelines
+│       └── ci.yaml
+│
+├── Dockerfile                  # Image اپلیکیشن
+├── docker-compose.yaml         # برای اجرای لوکال
+├── requirements.txt            # وابستگی‌های پایتون
+├── prometheus.yml              # کانفیگ مانیتورینگ
+├── manage.py
+└── README.md
+```
+
+---
+
+## ⚙️ پیش‌نیازها
+
+قبل از شروع، مطمئن شوید ابزارهای زیر نصب هستند:
+
+| ابزار | نسخه پیشنهادی | کاربرد |
+|-------|----------------|--------|
+| Docker | 24+ | Build ایمیج |
+| kubectl | 1.28+ | تعامل با K8s |
+| Kind | آخرین نسخه | کلاستر لوکال |
+| Helm (اختیاری) | 3.x | مدیریت پکیج |
+| ArgoCD CLI | آخرین نسخه | GitOps |
+| Python | 3.11+ | اجرای لوکال |
+
+---
+
+## 🚀 راه‌اندازی پروژه
+
+### 1️⃣ اجرای لوکال با Docker Compose
+
+```bash
+# کلون کردن پروژه
+git clone https://github.com/amir-hash19/storage-manager.git
+cd storage-manager
+
+# ساخت فایل .env
+cp .env.example .env
+
+# اجرا
+docker-compose up -d --build
+```
+
+### 2️⃣ راه‌اندازی روی Kubernetes
+
+#### مرحله ۱: ساخت کلاستر
+
+```bash
+kind create cluster --config your-config.yaml
+```
+
+#### مرحله ۲: ساخت Image و Load در Minikube
+
+```bash
+
+# Build ایمیج
+docker build -t storage-manager:latest .
+```
+
+#### مرحله ۳: ساخت Namespace
+
+```bash
+kubectl apply -f kubernetes/namespace.yaml
+kubectl get ns
+```
+
+#### مرحله ۴: اعمال Secrets و ConfigMaps
+
+```bash
+# Secrets
+kubectl apply -f kubernetes/postgres/secret.yaml
+kubectl apply -f kubernetes/web/secret.yaml
+kubectl apply -f kubernetes/minio/secret.yaml
+
+# ConfigMaps
+kubectl apply -f kubernetes/web/configmap.yaml
+```
+
+> ⚠️ **نکته امنیتی:** مقادیر Secrets را قبل از push در ریپو با `base64` مخفی کنید یا از Sealed Secrets استفاده کنید.
+
+#### مرحله ۵: راه‌اندازی دیتابیس و Storage
+
+```bash
+# PostgreSQL
+kubectl apply -f kubernetes/postgres/
+
+# Redis
+kubectl apply -f kubernetes/redis/
+
+# MinIO
+kubectl apply -f kubernetes/minio/
+```
+
+#### مرحله ۶: راه‌اندازی اپلیکیشن
+
+```bash
+# Django Web
+kubectl apply -f kubernetes/web/
+
+# Celery
+kubectl apply -f kubernetes/celery/
+kubectl apply -f kubernetes/celery-beat.yaml
+```
+
+#### مرحله ۷: Ingress
+
+```bash
+kubectl apply -f kubernetes/storage-manager-ingress.yaml
+```
+
+#### مرحله ۸: بررسی وضعیت
+
+```bash
+kubectl get pods -n storage-manager
+kubectl get svc -n storage-manager
+kubectl get ingress -n storage-manager
+```
+
+#### مرحله ۹: اجرای Migration و Collectstatic
+
+```bash
+POD=$(kubectl get pod -n storage-manager -l app=django-web -o jsonpath="{.items[0].metadata.name}")
+
+kubectl exec -it $POD -n storage-manager -- python manage.py migrate
+kubectl exec -it $POD -n storage-manager -- python manage.py collectstatic --noinput
+kubectl exec -it $POD -n storage-manager -- python manage.py createsuperuser
+```
+
+#### مرحله ۱۰: دسترسی به اپلیکیشن
+
+```bash
+# اضافه کردن به /etc/hosts
+echo "127.0.0.1 storage-manager.local" | sudo tee -a /etc/hosts
+
+# باز کردن در مرورگر
+# http://storage-manager.local
+```
+
+---
+
+## 📦 توضیح فایل‌های Kubernetes
+
+### `web/deployment.yaml`
+بالا آوردنه 2 replica از اپلیکیشن Django با readiness و liveness probe.
+
+### `web/hpa-django.yaml`
+مقیاس خودکار بین 2 تا 5 پاد بر اساس مصرف CPU و Memory.
+
+### `postgres/statefulset.yaml`
+از StatefulSet استفاده شده چون Postgres به **stable network identity** و **Persistent Volume اختصاصی** نیاز دارد.
+
+
+
+### `celery-beat.yaml`
+زمان‌بندی تسک‌های دوره‌ای (مثلاً پاکسازی فایل‌های منقضی).
+
+### `storage-manager-ingress.yaml`
+مسیردهی به سرویس‌های داخل کلاستر با استفاده از Nginx Ingress.
+
+---
+
+## 🔄 CI/CD Pipeline
+
+پروژه از **GitHub Actions** برای CI و **ArgoCD** برای CD استفاده می‌کند.
+
+### Workflow کلی
+
+```
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│  Push Code   │───▶│  Run Tests   │───▶│  Build Image │───▶│  Push to     │
+│  to GitHub   │    │   & Lint     │    │   (Docker)   │    │   Registry   │
+└──────────────┘    └──────────────┘    └──────────────┘    └──────┬───────┘
+                                                                   │
+                                                                   ▼
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│  App Live    │◀───│  ArgoCD Sync │◀───│  Update K8s  │◀───│  Detect New  │
+│  on Cluster  │    │              │    │   Manifest   │    │    Image     │
+└──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
+```
+
+### نمونه `.github/workflows/ci.yaml`
+
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install black 
+
+
+
+      - name: Check Black
+        run: |
+          black --check .
+
+```
+
+
+
+---
+
+
+
+### نصب ArgoCD
+
+```bash
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
+
+### دسترسی به UI
+
+```bash
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+# دریافت پسورد اولیه
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+```
+
+### تعریف ابزار ArgoCD
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: storage-manager
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/<your-username>/storage-manager.git
+    targetRevision: main
+    path: kubernetes
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: storage-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+```
+
+### اضافه کردن ArgoCD
+
+```bash
+kubectl apply -f argocd-application.yaml
+```
+
+---
+
+## 📊 مانیتورینگ
+
+پروژه دارای `prometheus.yml` است. می‌توانید Prometheus و Grafana را با Helm نصب کنید:
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install monitoring prometheus-community/kube-prometheus-stack -n monitoring --create-namespace
+```
+
+---
+
+## 🛠 دستورات پرکاربرد
+
+```bash
+# مشاهده همه منابع در namespace
+kubectl get all -n storage-manager
+
+# لاگ‌های اپلیکیشن
+kubectl logs -f -n storage-manager -l app=django-web
+
+# ورود به پاد
+kubectl exec -it <pod-name> -n storage-manager -- bash
+
+# ری‌استارت Deployment
+kubectl rollout restart deployment/django -n storage-manager
+
+# مقیاس دادن دستی 
+kubectl scale deployment django --replicas=3 -n storage-manager
+
+# پاک کردن کل namespace
+kubectl delete namespace storage-manager
+
+# بررسی وضعیت HPA
+kubectl get hpa -n storage-manager
+
+# بررسی PVC‌ها
+kubectl get pvc -n storage-manager
+```
+
+---
+---
+---
+---
+---
+
+
+<div align="center">
+
+# Backend Section 👨‍💻
+
+</div>
+
+## 🤝 مشارکت
+
+1. Fork کنید
+2. یک Branch جدید بسازید (`git checkout -b feature/amazing`)
+3. Commit کنید (`git commit -m 'Add amazing feature'`)
+4. Push کنید (`git push origin feature/amazing`)
+5. Pull Request بزنید
+
+---
+
+
+# Storage Manager - کلون گوگل درایو
+
+یک API بک‌اند مقیاس‌پذیر و قابل نگهداری که با **Django**، **Django REST Framework** و **احراز هویت JWT** ساخته شده و از **Clean Architecture**، **Service Layer**، **Repository Pattern** و **Event-Driven Architecture** پیروی می‌کند.
+
+یکی از ماژول‌های اصلی این پروژه، یک **Storage Manager الهام‌گرفته از Google Drive** است که مدیریت پوشه‌های سلسله‌مراتبی، سازمان‌دهی فایل‌ها، آپلود، دانلود، جابه‌جایی، تغییر نام و حذف را از طریق یک API مبتنی بر REST فراهم می‌کند.
+
+این پروژه به طور کامل با **Docker Compose** کانتینری شده و برای مقیاس‌پذیری، قابلیت نگهداری و جداسازی تمیز دغدغه‌ها طراحی شده است.
+
+---
+
+# ویژگی‌ها
 
 - Clean Architecture
 - Service Layer
 - Repository Pattern
 - Event-Driven Architecture
-- JWT Authentication
-- RESTful API
-- Folder/File Management (Google Drive-like)
-- Docker & Docker Compose
-- Celery Background Tasks
-- Redis Message Broker
-- PostgreSQL Database
+- احراز هویت JWT
+- API مبتنی بر REST
+- مدیریت پوشه و فایل (شبیه Google Drive)
+- Docker و Docker Compose
+- تسک‌های پس‌زمینه Celery
+- Message Broker با Redis
+- دیتابیس PostgreSQL
 - Audit Logging
-- Pagination
-- Filtering & Searching
-- Permission-based APIs
-- Asynchronous Event Processing
-- Ready for Horizontal Scaling
+- صفحه‌بندی (Pagination)
+- فیلترینگ و جستجو
+- APIهای مبتنی بر مجوز (Permission-based)
+- پردازش رویداد به‌صورت آسنکرون
+- آماده برای مقیاس‌پذیری افقی
 
 ---
 
-# Tech Stack
+# تکنولوژی‌های استفاده‌شده
 
-| Technology | Purpose |
+| تکنولوژی | هدف |
 |------------|---------|
-| Python | Programming Language |
-| Django | Web Framework |
+| Python | زبان برنامه‌نویسی |
+| Django | فریم‌ورک وب |
 | Django REST Framework | REST API |
-| PostgreSQL | Database |
-| Redis | Cache & Message Broker |
-| Celery | Background Tasks |
-| JWT | Authentication |
-| Docker | Containerization |
-| Docker Compose | Local Development |
-| Clean Architecture | Application Structure |
-| Repository Pattern | Data Access Layer |
-| Service Layer | Business Logic |
-| Event Driven | Loose Coupling |
+| PostgreSQL | دیتابیس |
+| Redis | Cache و Message Broker |
+| Celery | تسک‌های پس‌زمینه |
+| JWT | احراز هویت |
+| Docker | کانتینری‌سازی |
+| Docker Compose | توسعه لوکال |
+| Clean Architecture | ساختار اپلیکیشن |
+| Repository Pattern | لایه دسترسی به داده |
+| Service Layer | منطق کسب‌وکار |
+| Event Driven | کاهش وابستگی بین ماژول‌ها |
 
 ---
-## Obejct Storge Dashboard 
+## داشبورد Object Storage
 
 <p align="center">
   <img src="docs/object_storage.png" width="900" alt="Dashboard">
 </p>
 
-# Project Structure
+# ساختار پروژه
 
 ```
 project/
@@ -79,65 +539,65 @@ project/
 
 ---
 
-# Application Modules
+# ماژول‌های اپلیکیشن
 
 ## useraccount
 
-Responsible for:
+مسئول موارد زیر است:
 
-- User Registration
-- Login
-- JWT Authentication
-- Profile Management
-- Permissions
-- User Events
+- ثبت‌نام کاربر
+- ورود (Login)
+- احراز هویت JWT
+- مدیریت پروفایل
+- مجوزها (Permissions)
+- رویدادهای کاربر
 
 ---
 
 ## storage
 
-Responsible for:
+مسئول موارد زیر است:
 
-- Folder Management
-- File Management
-- Nested Directories
-- Upload
-- Download
-- Rename
-- Move
-- Delete
-- Storage Events
+- مدیریت پوشه
+- مدیریت فایل
+- پوشه‌های تودرتو (Nested Directories)
+- آپلود
+- دانلود
+- تغییر نام
+- جابه‌جایی
+- حذف
+- رویدادهای Storage
 
-The storage system behaves similarly to **Google Drive**, allowing unlimited nested folders and files.
+سیستم Storage رفتاری مشابه **Google Drive** دارد و اجازه می‌دهد پوشه‌ها و فایل‌ها به‌صورت تودرتو و نامحدود ساخته شوند.
 
 ---
 
 ## dashboard
 
-Responsible for:
+مسئول موارد زیر است:
 
-- Dashboard Statistics
-- Storage Overview
-- User Metrics
-- Activity Summary
+- آمار داشبورد
+- نمای کلی Storage
+- متریک‌های کاربر
+- خلاصه فعالیت‌ها
 
 ---
 
 ## auditlog
 
-Responsible for:
+مسئول موارد زیر است:
 
-- Recording System Events
-- Tracking User Activities
-- Logging File Operations
-- Authentication Logs
-- Event History
+- ثبت رویدادهای سیستم
+- ردیابی فعالیت‌های کاربر
+- لاگ عملیات فایل
+- لاگ‌های احراز هویت
+- تاریخچه رویدادها
 
 ---
 
-# Architecture
+# معماری (Architecture)
 
-This project follows **Clean Architecture** principles.
+این پروژه از اصول **Clean Architecture** پیروی می‌کند.
 
 ```
                  HTTP Request
@@ -160,42 +620,42 @@ This project follows **Clean Architecture** principles.
                   PostgreSQL
 ```
 
-Each layer has a single responsibility.
+هر لایه یک مسئولیت واحد دارد.
 
 ---
 
-# Clean Architecture Layers
+# لایه‌های Clean Architecture
 
-## Presentation Layer
+## لایه Presentation (نمایش)
 
-Contains:
+شامل:
 
 - Views
 - Serializers
 - Permissions
 - Authentication
-- API Validation
+- اعتبارسنجی API
 
-Responsibilities:
+مسئولیت‌ها:
 
-- Receive HTTP Requests
-- Validate Input
-- Return HTTP Responses
+- دریافت درخواست‌های HTTP
+- اعتبارسنجی ورودی
+- بازگرداندن پاسخ‌های HTTP
 
 ---
 
-## Service Layer
+## لایه Service
 
-Contains the complete business logic.
+شامل تمام منطق کسب‌وکار است.
 
-Responsibilities:
+مسئولیت‌ها:
 
-- Execute use cases
-- Validate business rules
-- Coordinate repositories
-- Publish domain events
+- اجرای Use Caseها
+- اعتبارسنجی قواعد کسب‌وکار
+- هماهنگ‌سازی Repositoryها
+- انتشار رویدادهای دامنه (Domain Events)
 
-Example:
+مثال:
 
 ```
 Create Folder
@@ -213,20 +673,20 @@ FolderCreatedEvent
 
 ---
 
-## Repository Layer
+## لایه Repository
 
-Responsible for database communication.
+مسئول ارتباط با دیتابیس است.
 
-Responsibilities:
+مسئولیت‌ها:
 
-- Query Database
-- Create Records
-- Update Records
-- Delete Records
+- کوئری زدن به دیتابیس
+- ساخت رکورد
+- به‌روزرسانی رکورد
+- حذف رکورد
 
-Services never communicate directly with Django ORM.
+سرویس‌ها هرگز به‌صورت مستقیم با Django ORM ارتباط برقرار نمی‌کنند.
 
-Instead:
+به‌جای آن:
 
 ```
 Service
@@ -238,11 +698,11 @@ ORM
 
 ---
 
-## Domain Events
+## رویدادهای دامنه (Domain Events)
 
-The application is loosely coupled using events.
+اپلیکیشن با استفاده از رویدادها به‌صورت loosely coupled نگه‌داری می‌شود.
 
-Example events:
+نمونه رویدادها:
 
 ```
 UserRegisteredEvent
@@ -264,9 +724,9 @@ FileMovedEvent
 PasswordChangedEvent
 ```
 
-Each event can have multiple listeners.
+هر رویداد می‌تواند چندین Listener داشته باشد.
 
-Example:
+مثال:
 
 ```
 FolderCreatedEvent
@@ -279,11 +739,11 @@ FolderCreatedEvent
         └────────► Notification
 ```
 
-No module depends directly on another module.
+هیچ ماژولی به‌طور مستقیم به ماژول دیگر وابسته نیست.
 
 ---
 
-# Folder Structure (Example)
+# ساختار پوشه (مثال)
 
 ```
 storage/
@@ -311,11 +771,11 @@ storage/
 └── signals.py
 ```
 
-Every application follows the same architecture.
+هر اپلیکیشن از همین معماری پیروی می‌کند.
 
 ---
 
-# Request Flow
+# جریان درخواست (Request Flow)
 
 ```
 Client
@@ -347,7 +807,7 @@ Response
 
 ---
 
-# Event Flow
+# جریان رویداد (Event Flow)
 
 ```
 Business Action
@@ -366,11 +826,11 @@ Audit  Dashboard  Notifications
 
 ---
 
-# Authentication
+# احراز هویت
 
-Authentication is implemented using **JWT**.
+احراز هویت با استفاده از **JWT** پیاده‌سازی شده است.
 
-Typical flow:
+جریان معمول:
 
 ```
 Register
@@ -394,75 +854,75 @@ Authenticated APIs
 
 ---
 
-# API Endpoints
+# Endpointهای API
 
-## Authentication
+## احراز هویت
 
-| Method | Endpoint | Description |
+| متد | Endpoint | توضیح |
 |---------|----------|-------------|
-| POST | `/api/auth/register/` | Register new user |
-| POST | `/api/auth/login/` | Login |
-| POST | `/api/auth/refresh/` | Refresh JWT Token |
-| POST | `/api/auth/logout/` | Logout |
-| GET | `/api/auth/profile/` | Current User |
-| PATCH | `/api/auth/profile/` | Update Profile |
-| POST | `/api/auth/change-password/` | Change Password |
+| POST | `/api/auth/register/` | ثبت‌نام کاربر جدید |
+| POST | `/api/auth/login/` | ورود |
+| POST | `/api/auth/refresh/` | تازه‌سازی JWT Token |
+| POST | `/api/auth/logout/` | خروج |
+| GET | `/api/auth/profile/` | کاربر فعلی |
+| PATCH | `/api/auth/profile/` | به‌روزرسانی پروفایل |
+| POST | `/api/auth/change-password/` | تغییر رمز عبور |
 
 ---
 
 ## Storage
 
-### Folder APIs
+### APIهای پوشه
 
-| Method | Endpoint | Description |
+| متد | Endpoint | توضیح |
 |---------|----------|-------------|
-| GET | `/api/storage/folders/` | List folders |
-| POST | `/api/storage/folders/` | Create folder |
-| GET | `/api/storage/folders/{id}/` | Folder details |
-| PATCH | `/api/storage/folders/{id}/` | Rename folder |
-| DELETE | `/api/storage/folders/{id}/` | Delete folder |
-| POST | `/api/storage/folders/{id}/move/` | Move folder |
+| GET | `/api/storage/folders/` | لیست پوشه‌ها |
+| POST | `/api/storage/folders/` | ساخت پوشه |
+| GET | `/api/storage/folders/{id}/` | جزئیات پوشه |
+| PATCH | `/api/storage/folders/{id}/` | تغییر نام پوشه |
+| DELETE | `/api/storage/folders/{id}/` | حذف پوشه |
+| POST | `/api/storage/folders/{id}/move/` | جابه‌جایی پوشه |
 
 ---
 
-### File APIs
+### APIهای فایل
 
-| Method | Endpoint | Description |
+| متد | Endpoint | توضیح |
 |---------|----------|-------------|
-| GET | `/api/storage/files/` | List files |
-| POST | `/api/storage/files/upload/` | Upload file |
-| GET | `/api/storage/files/{id}/` | File details |
-| GET | `/api/storage/files/{id}/download/` | Download file |
-| PATCH | `/api/storage/files/{id}/` | Rename file |
-| DELETE | `/api/storage/files/{id}/` | Delete file |
-| POST | `/api/storage/files/{id}/move/` | Move file |
+| GET | `/api/storage/files/` | لیست فایل‌ها |
+| POST | `/api/storage/files/upload/` | آپلود فایل |
+| GET | `/api/storage/files/{id}/` | جزئیات فایل |
+| GET | `/api/storage/files/{id}/download/` | دانلود فایل |
+| PATCH | `/api/storage/files/{id}/` | تغییر نام فایل |
+| DELETE | `/api/storage/files/{id}/` | حذف فایل |
+| POST | `/api/storage/files/{id}/move/` | جابه‌جایی فایل |
 
 ---
 
-## Dashboard
+## داشبورد
 
-| Method | Endpoint | Description |
+| متد | Endpoint | توضیح |
 |---------|----------|-------------|
-| GET | `/api/dashboard/overview/` | Dashboard Overview |
-| GET | `/api/dashboard/storage/` | Storage Statistics |
-| GET | `/api/dashboard/activity/` | Recent Activities |
+| GET | `/api/dashboard/overview/` | نمای کلی داشبورد |
+| GET | `/api/dashboard/storage/` | آمار Storage |
+| GET | `/api/dashboard/activity/` | فعالیت‌های اخیر |
 
 ---
 
 ## Audit Logs
 
-| Method | Endpoint | Description |
+| متد | Endpoint | توضیح |
 |---------|----------|-------------|
-| GET | `/api/audit/logs/` | List Audit Logs |
-| GET | `/api/audit/logs/{id}/` | Audit Log Details |
+| GET | `/api/audit/logs/` | لیست Audit Logها |
+| GET | `/api/audit/logs/{id}/` | جزئیات Audit Log |
 
 ---
 
-# Running with Docker
+# اجرا با Docker
 
-The project is fully containerized.
+این پروژه به‌طور کامل کانتینری شده است.
 
-## Start
+## شروع
 
 ```bash
 docker compose up --build
@@ -470,7 +930,7 @@ docker compose up --build
 
 ---
 
-## Stop
+## توقف
 
 ```bash
 docker compose down
@@ -478,7 +938,7 @@ docker compose down
 
 ---
 
-## Run Migrations
+## اجرای Migrationها
 
 ```bash
 docker compose exec web python manage.py migrate
@@ -486,7 +946,7 @@ docker compose exec web python manage.py migrate
 
 ---
 
-## Create Superuser
+## ساخت Superuser
 
 ```bash
 docker compose exec web python manage.py createsuperuser
@@ -494,7 +954,7 @@ docker compose exec web python manage.py createsuperuser
 
 ---
 
-## Run Tests
+## اجرای تست‌ها
 
 ```bash
 docker compose exec web pytest
@@ -502,49 +962,57 @@ docker compose exec web pytest
 
 ---
 
-# Services
+# سرویس‌ها
 
-Docker Compose starts the following services:
+Docker Compose سرویس‌های زیر را راه‌اندازی می‌کند:
 
 - Django API
 - PostgreSQL
 - Redis
 - Celery Worker
-- Celery Beat (optional)
+- Celery Beat (اختیاری)
 
 ---
 
-# Why This Architecture?
+# چرا این معماری؟
 
-This architecture provides:
+این معماری فراهم می‌کند:
 
-- Clear separation of concerns
-- Testable business logic
-- Loosely coupled modules
-- Easy scalability
-- High maintainability
-- Easy feature extension
-- Independent domain components
-- Minimal ORM dependency inside business logic
+- جداسازی تمیز دغدغه‌ها
+- منطق کسب‌وکار قابل تست
+- ماژول‌های loosely coupled
+- مقیاس‌پذیری آسان
+- قابلیت نگهداری بالا
+- افزودن آسان ویژگی‌های جدید
+- کامپوننت‌های دامنه مستقل
+- حداقل وابستگی به ORM در منطق کسب‌وکار
 
 ---
 
-# Future Improvements
+# بهبودهای آینده
 
 - API Versioning
-- OpenAPI / Swagger Documentation
-- WebSocket Notifications
-- File Sharing
-- Role-Based Access Control (RBAC)
-- Object-Level Permissions
+- مستندات OpenAPI / Swagger
+- اعلان‌های WebSocket
+- اشتراک‌گذاری فایل
+- کنترل دسترسی مبتنی بر نقش (RBAC)
+- مجوزهای سطح Object
 - Soft Delete
-- Multi-Tenant Support
-- Distributed Event Bus (Kafka/RabbitMQ)
-- S3 / MinIO Storage
-- Prometheus & Grafana Monitoring
+- پشتیبانی Multi-Tenant
+- Event Bus توزیع‌شده (Kafka/RabbitMQ)
+- ذخیره‌سازی S3 / MinIO
+- مانیتورینگ با Prometheus و Grafana
 
 ---
 
-# License
+# لایسنس
 
-This project is intended as a production-ready backend template demonstrating Clean Architecture, Service Layer, Repository Pattern, and Event-Driven design using Django and Django REST Framework.
+این پروژه به‌عنوان یک قالب بک‌اند آماده تولید (production-ready) طراحی شده که Clean Architecture، Service Layer، Repository Pattern و طراحی Event-Driven را با استفاده از Django و Django REST Framework به نمایش می‌گذارد.
+
+
+
+<div align="center">
+
+**   ساخته شده با ❤️ Amir-hash19  **
+
+</div>
